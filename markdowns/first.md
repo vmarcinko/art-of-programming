@@ -1,5 +1,10 @@
 # DATA
 
+OK, so all data values, regardless of their type, have their textual representation (string) so they can all be mistaken for string values, 
+But we like different data types because they provide different meaning to the data, and also different operations.
+
+---
+
 In mathematics, we use data such as this:
 
     23, 0, -45, 3424242342
@@ -7,6 +12,10 @@ In mathematics, we use data such as this:
 How do we call this type of data?
 
 **Number**, or numerical data.
+
+What are common operations that can be done with numbers:
+
+Adding, subtracting, multiplying, comparing etc... Whole mathematics at our disposal.
 
 ---
 
@@ -16,7 +25,7 @@ Is this data:
     -12.0004
     501.005
 
-also of number type as previous ones:
+also of **number** type as previous ones:
 
     23
     0
@@ -27,7 +36,7 @@ also of number type as previous ones:
 
 Yes. 
 
-But are they also of different type?
+But they are also different in a way, right? How?
 
 Yes. One example has data of **decimal** type and other one of **integer** type. But both of them are **number** type also.
 
@@ -48,6 +57,10 @@ Text. Or **string**, in programming languages.
 
 OK, great, now we know 2 types of data: **number** and **string**.
 
+What operations can be done with strings?
+
+Splitting on certain position, comparison, removing portions of text, counting length of text, etc...
+
 ---
 
 What is the type of following data?
@@ -62,7 +75,11 @@ What is the characteristics of boolean data?
 
 We have data with just 2 possible values.
 
-OK, now we know one more data type.
+What operations are done on booleans?
+
+Checking whether something is true or not, switching to opposite value, all binary operations etc...
+
+OK, now we know one more primitive data type.
 
 ### Textual representation
 
@@ -99,21 +116,6 @@ And what about this - is this a string or a boolean then?
     true
 
 Well, it can be either also, but we mostly think of it as boolean, because this is kinda "common word" in most programming languages to represent boolean value.
-
-OK, so all data values, regardless of their type, have their textual representation (string) so they can all be mistaken for string values, 
-But we like different data types because they provide different meaning to the data, and also different operations.
-
-What are common operations that can be done with numbers:
-
-Adding, subtracting, multiplying, comparing etc... Whole mathematics at our disposal.
-
-What operations can be done with strings?
-
-Splitting on certain position, comparison, removing portions of text etc...
-
-What operations are done on booleans?
-
-Checking whether something is true or not, switching to opposite value, all binary operations etc...
 
 Because we want to remove ambiguity between strings and other data types, let's introduce special characters 
 to mark something as a string, and it would be double quotes, such as:
@@ -154,16 +156,16 @@ Let's say we have a bunch of numbers:
     22, 3, -300, 56, 1, 0, 11
 
 If you want to have a collection value that contains all these numbers, and it is important:
-- that each element has a position in it, and allows duplicates, then we use a **list** data type
-- that order of elements is not present, and there are no duplicates, then we use a **set** data type (like mathematical set)
+- that each element has a position in it, meaning, elements are ordered by position, and allows duplicates, then we use a **list** data type
+- that element position does not exist, thus no ordering is present when reading from it, and there are no duplicate values in it, then we use a **set** data type (like mathematical set)
 
 OK, so again, let's say we have a **list** that contains following numerical elements:
 
-    22, 3, -300, 56, 1, 0, 11
+    22, 3, -300, 0, 1
     
 What is the size of such list?
 
-It's 7.
+It's 5.
 
 What is the element in position 0?
 
@@ -173,25 +175,25 @@ What is the element under position 1?
 
 It's 3
 
-And under position 7?
+And under position 5?
 
-There is no element under position 7, since whole list contains 7 elements, so last position is 6.
+There is no element under position 5, since whole list contains 5 elements, so largest position is 4.
 
 And if we add number 22 to this list, what is the size of such list?
 
-It would be 8.
+It would be 6.
 
 ---
 
 Ok, so imagine now the same bunch of numbers present in a **set**:
 
-    22, 3, -300, 56, 1, 0, 11
+    22, 3, -300, 0, 1
     
 Remember, order of elements is not present, and there are no duplicates.
 
 What is the size of such set?
 
-It's 7.
+It's 5.
 
 What is element at position 0?
 
@@ -199,14 +201,14 @@ It's impossible to fetch such element, because set doesn't have positions, doesn
 
 And if we add number 22 to this list, what is the size of such list?
 
-It's still 7, since a set doesn't allow duplicates, and we already have element 22.
+It's still 5, since a set doesn't allow duplicates, and we already have element 22.
 
 Currently, again, as with case with strings and other data types, we don't have textual way to differentiate between a list and a set, 
 so let's introduce special characters for that, **[ el1, el2, ... ]** for a list, and **#{ el1, el2, ... }** for a set, something like:
 
 
-    [ 22, 3, -300, 56, 1, 0, 11 ]       (list)
-    #{ 22, 3, -300, 56, 1, 0, 11 }      (set)
+     [ 22, 3, -300, 0, 1 ]      (list)
+    #{ 22, 3, -300, 0, 1 }      (set)
     
 ---
 
@@ -214,14 +216,23 @@ OK, now we come to one of most important collection data types.
 In your life, you probably filled countless paper forms with your personal data. 
 Let's say we have a following person data, such as:
 
-    id:             4413
-    name:           "John Doe"
-    age:            56
-    employed:       true
-
+    "id":         4413,
+    "name":       "John Doe",
+    "age":        56,
+    "employed":   true
 
 You notice that this complex piece of data has **key-value**, or **name-value**, structure. Each key/name has a value associated with it.  
 We call such data type a **map**, and it is another collection data type we introduced (previous ones are list and set).
+
+Actually, for same reason already mentioned in case of **string, list or set**, let's use some special characters to 
+define a map - **{ ... }**, so we would have following:
+
+    {
+        "id":         4413,
+        "name":       "John Doe",
+        "age":        56,
+        "employed":   true
+    }
 
 So, how many **keys** (person **attributes**) does the person map above has?
 
@@ -233,11 +244,13 @@ It's a string.
 
 Does it make sense for a map to have duplicate keys, such as "age" being present 2 times, for example:
 
-    id:             4413
-    name:           "John Doe"
-    age:            56
-    employed:       true
-    age:            16
+    {
+        "id":         4413,
+        "name":       "John Doe",
+        "age":        56,
+        "employed":   true,
+        "age":        16,
+    }
 
 No, we wouldn't know what the actual value of attribute "age" is then. 
 A map cannot contain duplicate keys.
@@ -275,32 +288,140 @@ Well, both would work, but a set would suit better, because we don't want duplic
 
 So if we add "nicknames" set attribute to a person map, we will end up with following map value:
 
-    id:             4413
-    name:           "John Doe"
-    age:            56
-    employed:       true
-    nicknames:      #{ "Johny", "BigJ", "Maverick" }
+    {
+        "id":         4413,
+        "name":       "John Doe",
+        "age":        56,
+        "employed":   true,
+        "nicknames":  #{ "Johny", "BigJ", "Maverick" }
+    }
 
-### Nested structures
+What if we wanted to specify person nicknames, but in order of importance, so that first is the most used, and the last one is least used nickname.
+What data type would you use for such "nicknames" attribute ?
 
-Let's take initial person map:
+Well, the list is needed then, because someone who reads this data later will need to know what the order of nicknames in a list, otherwise, it wouldn't know which one is more important. 
+Ordering is very important in such example. So instead of:
 
-    id:             4413
-    name:           John Doe
-    age:            56
-    employed:       true
+    "nicknames":  #{ "Johny", "BigJ", "Maverick" }
 
-Lets' say we want to add **address** attribute. Let's pick a string as its data type, 
-so we end up with a person such as:
+we would have something like:
 
-    id:             4413
-    name:           "John Doe"
-    address:        Elm Street, 123, Cleveland, Ohio, USA        
-    age:            56
-    employed:       true
+    "nicknames":  [ "Johny", "BigJ", "Maverick" ]
+    
+But since we use a list now, can it happen that creator of such data mistakenly puts duplicate here - such as 
 
+    "nicknames":  [ "Johny", "BigJ", "Maverick", "Johny" ]
+?
+
+Ahhh, yes, that would be bad, unlike a set, a list allows duplicates. Well, I guess this is the trade-off, and we only have 
+a set or a list to pick from. 
+
+Let's move on ... What do you think, can a **map** contain **another map** inside?
+
+Sure, this is called **nesting**, or **embedding**, when one complex value contains another complex value.
+
+For example, say we add a **spouse** attribute to our person:
+
+    {
+        "id":         4413,
+        "name":       "John Doe",
+        "age":        56,
+        "employed":   true,
+        "spouse":     {
+                        "id":         741
+                        "name":       "Johanna Smith"
+                        "age":        51
+                        "employed":   false
+                      }
+    }
+
+As we said, map is a **key-value** data structure, and as in previous "person" example, 
+a map is very often used to represent some **entity** which has its **attributes** (such as person with its attributes).
+
+What would be **attributes**, for some **car** entity?
+
+Something like vehicle manufacturer, model, serial number, production year etc...
+
+An entity doesn't have to be just a real thing in this world. What does following map represents for example?
+
+    {
+        "type":         "block-bank-account",
+        "account-id":   441234534,
+        "reason":       "Money loundring detected via this account!"
+    }
+
+This seems like some type of **command**, or **request**, to block bank account. 
+I guess. Mostly because "type" attribute has action in **imperative** form. 
+
+And what about the next map?
+
+
+    {
+        "type":         "bank-account-blocked",
+        "account-id":   441234534,
+        "reason":       "Money loundring detected via this account!",
+        "timestamp":    "2019-06-11 20:22:05"
+    }
+
+Well, this "type" field contains action **in past tense**, and a **timestamp** attribute, 
+so this map represents something like an **event**, maybe due to previously executed command from previous example, right?
+
+But a map can be used for other things also, not just for representing entities, and one frequent example is following. 
+What data type is used for keys in this (a bit more complex) map?
+
+    {
+        4413:      {
+                        "id":         4413
+                        "name":       "John Doe"
+                        "age":        56
+                    },
+        8913:       {
+                        "id":         8913
+                        "name":       "Rick Smith"
+                        "age":        44
+                    },
+        7771:       {
+                        "id":         7771
+                        "name":       "Vince Salash"
+                        "age":        13
+                    }
+    }
+
+Yes, integer is key type in this map.
+
+And what is the meaning of these keys in this map (Hint - take a look at person map associated with each key)?
+
+Yes, these keys are actually person IDs. We could even call this whole map something like "person by ID map".
+ 
+So, what would this map be good for?
+
+It would be great for quick lookup of a person based on its ID.
+
+And if we used person **name** (string) instead of **ID** as a key - what would it would be good for? 
+
+For quick lookup of a person based on its name.
+In general, such data structure is called an **index**, and maps are also frequently used for indexes, not just for entities.
+
+When you hear word "index", what it mostly reminds you of?
+
+A database, right! Actually, in overly simplistic terms, databases actually store similar "map-like" structures 
+for each created index on disk, so the queries could find relevant data much faster if we search by some indexed columns (id, name ...). 
+ 
+### Re-shaping the data
+
+Lets' say we want to add **address** attribute to our initial person value. 
+Let's pick a string as its data type, so we end up with a person such as:
+
+    {
+        "id":         4413
+        "name":       "John Doe"
+        "address":    "Elm Street, 123, Cleveland, Ohio, USA"        
+        "age":        56
+        "employed":   true
+    }
+    
 And it's perfectly valid person map. But thing is, as we mentioned, we use different data types 
-because they have different meaning, and provide different operations on them. So we pick data type 
+because they have different meaning, and provide different operations on them. So we aim to pick data type 
 that is most plesant to work with. 
 
 In case of an address, we will probably somewhere in our program want to read later an 
@@ -308,9 +429,9 @@ address' parts separately (city, street, state, country...) and process them in 
 For example, maybe we will validate whether country field is one of valid country names, 
 and that street number is a positive integer etc...
 
-If address such as:
+Our address example:
     
-    Elm Street, 123, Cleveland, Ohio, USA
+    "Elm Street, 123, Cleveland, Ohio, USA"
 
 is just a string - how would you fetch separate address' parts?
 
@@ -324,29 +445,54 @@ Do we know some data type that already provides address' parts separately?
 Yes, a **map**!
 
 So, we can maybe decide to have address value as a map with 5 keys, it would maybe look like this:
-
-    Street:         Elm Street
-    Street number:  123
-    City:           Cleveland
-    State:          Ohio
-    Country:        USA
-
+    
+    {
+        "Street":         "Elm Street"
+        "Street number":  123
+        "City":           "Cleveland"
+        "State":          "Ohio"
+        "Country":        "USA"
+    }
+    
 You probably also seen this countless times in those paper forms with multiple boxes for address' parts,  
 where you had to enter your address. This data type has much better guarantees for valid data and is much more 
-pleasant to work with compared to plain **string**.    
+pleasant to process with our program compared to plain **string**.
 
-Now, let's get bakc to our complete person value:
+But, if we take another look to the same value when given as single string value:
 
-    id:             4413
-    name:           "John Doe"
-    address:        Street:         Elm Street
-                    Street number:  123
-                    City:           Cleveland
-                    State:          Ohio
-                    Country:        USA
-    age:            56
-    employed:       true
+    "Elm Street, 123, Cleveland, Ohio, USA"
 
-What we have here is a map (address value) **within** a map (person value). 
-This is called **nesting**, or **embedding**, when one complex value contains another complex value.
-Here, an address is embedded, or nested, within a person.
+Compared to destructured map value, what is nice with this shape of data?
+
+Yes, it's much shorter, and probably easier to read by human eye!
+That's actually often the case, so there is a saying something like:
+
+    Humans love strings and programs love maps.
+    
+That's why we often re-shape same data to better suit some new context. For example, when we want to present the 
+address on some user interface, say web page, our programs will frequently format (convert) given address 
+as single line string, to be easier to read.  
+
+Now, let's get back to our complete person value:
+
+    {
+        "id":             4413
+        "name":           "John Doe"
+        "address":        {
+                            "Street":         "Elm Street"
+                            "Street number":  123
+                            "City":           "Cleveland"
+                            "State":          "Ohio"
+                            "Country":        "USA"
+                        }
+        "age":            56
+        "employed":       true
+    }
+
+### Map key optionality - null, empty list or set
+### Flattening nested map
+### Reshaping data for better usability
+- list into map as index
+- date string into map
+- address string into map
+### map "types"
