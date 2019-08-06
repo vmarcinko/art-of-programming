@@ -1,8 +1,5 @@
 # DATA
 
-OK, so all data values, regardless of their type, have their textual representation (string) so they can all be mistaken for string values, 
-But we like different data types because they provide different meaning to the data, and also different operations.
-
 ---
 
 In mathematics, we use data such as this:
@@ -73,7 +70,7 @@ What is the type of following data?
 
 What is the characteristics of boolean data?
 
-We have data with just 2 possible values.
+We have data with just 2 possible values - one that defines truthy value, and other falsy.
 
 What operations are done on booleans?
 
@@ -81,7 +78,7 @@ Checking whether something is true or not, switching to opposite value, all bina
 
 OK, now we know one more primitive data type.
 
-### Textual representation
+### Encodings
 
 Again, what is this data type:
 
@@ -117,12 +114,43 @@ And what about this - is this a string or a boolean then?
 
 Well, it can be either also, but we mostly think of it as boolean, because this is kinda "common word" in most programming languages to represent boolean value.
 
-Because we want to remove ambiguity between strings and other data types, let's introduce special characters 
-to mark something as a string, and it would be double quotes, such as:
+Because we want to remove ambiguity between strings and other data types, let's introduce special character 
+to mark something as a string, and let's pick a double quote, such as:
 
     "This is a string"
     "true"
     "-23.45"   
+
+Could have we picked a single quote instead of double quote?
+
+Yes, of course. We could've picked any character we wanted - this is our textual format, we can decide however we want to represent something. 
+
+The way we write different data values is called **encoding**, or more precisely, **textual encoding** 
+because we're writing them here as sequence of characters, unlike **binary encoding** where we can write 
+data as sequence of bytes.
+
+We demonstrated how we use special character to designate special data type in textual encoding 
+(example String above), so how could we designate special data type in binary encoding?
+
+Similar - with some special byte that marks the data type! Maybe something like having prefix byte value:
+- 0 - following 4 bytes are integer
+- 1 - following 8 bytes are for decimal
+- 2 - following 1 byte is boolean
+- 3 - following 1 byte specifies string length N, and then N bytes are string
+
+What type of encoding (textual or binary) is more compact, meaning, encoded form is smaller?
+
+Binary. Since it is more compact, it's usually faster to read/write.
+
+What type of encoding is easier to read?
+
+Textual of course! That's mostly the reason why nowadays the most popular formats for program communication are 
+text ones (JSON, XML).
+
+Also, programs are mostly written in text files, and they have data encoded in them also, such as:
+
+    var a = 'true'
+    var b = true;
 
 ---
 
@@ -433,7 +461,7 @@ Our address example:
     
     "Elm Street, 123, Cleveland, Ohio, USA"
 
-is just a string - how would you fetch separate address' parts?
+is just a string - how would your program read separate address' parts?
 
 Well, maybe you would split this single big string by commas, and hope that there are 5 parts. 
 And also hoping that first part is street number, second part is street name, third part is city etc...
@@ -473,6 +501,91 @@ That's why we often re-shape same data to better suit some new context. For exam
 address on some user interface, say web page, our programs will frequently format (convert) given address 
 as single line string, to be easier to read.  
 
+### Entity types
+
+We said earlier than a map is often used to represent some entity, such as a person, a company, a car, whatever.
+Imagine we have a list of such entities, such as a list of people:
+
+    [ 
+        { "id": 23243, "name": "John Doe", "email": "john@gmail.com" }, 
+        { "id": 6613, "name": "Johanna Smith", "email": "johanna@yahoo.com" },
+        { "id": 211, "name": "Rick Tracy", "email": "rick@facebook.com" }
+    ]
+It's easy to imagine some code that would read such a person list, and do something with it, like send email to each person element (a map) in the list
+
+But what if we have some **list of mixed entities**, let's say people **and** cars :
+
+    [ 
+        { "id": 23243, "name": "John Doe", "email": "john@gmail.com" }, 
+        { "id": "zudza-da32dk-dfsd", "model": "Ford C-Max", "year": 2009 },
+        { "id": "aabho-rrorz-43jjk", "model": "Peugeot 206", "year": 2012 },
+        { "id": 211, "name": "Rick Tracy", "email": "rick@facebook.com" }
+    ]
+
+Now, imagine some code would read this list, loop over it, and for each element do some type-specific action:
+- if element is a person, send email with person information
+- if element is a car, generate PDF file with its car information
+
+How would you check if list element is of specific type - a person or a car?
+
+Well, maybe first check if element map has "name" key - if it does, it is a person, and if not, then it is a car.
+
+Hmmm, OK, that would work. But imagine if car would rename its "model" key into "name", then **both** person and car would have "name" key.
+What then?
+   
+Hmmm, a problem, maybe by "year", or "email" key then?
+
+Yeah, but same problem with "name"/"model" is present here, you never know when different entities have same map keys, 
+or when they decide to rename it later. What about introducing special **type** key:
+
+    [ 
+        { "type": "PERSON", "id": 23243, "name": "John Doe", "email": "john@gmail.com" }, 
+        { "type": "CAR",  "id": "zudza-da32dk-dfsd", "model": "Ford C-Max", "year": 2009 },
+        { "type": "CAR", "id": "aabho-rrorz-43jjk", "model": "Peugeot 206", "year": 2012 },
+        { "type": "PERSON", "id": 211, "name": "Rick Tracy", "email": "rick@facebook.com" }
+    ]
+
+Differentiation is easy now, right? Now our code would look like:
+- if element's "type" equals "PERSON", send email with person information
+- if element's "type" equals "CAR", generate PDF file with car information
+
+If a car entity naturally has an **type** attribute that defines whether the car is SUV, limousine or some other type of vehicle?
+Can we use name "type" for this new key that is specific only to car entity? Something like:
+
+    { "type": "CAR",  "id": "zudza-da32dk-dfsd", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
+
+No, because a map cannot have multiple keys with same name, and "type" is already used for entity type differentiation.
+
+So, should we rename already present entity "type" key into something else, say **"--type--"**, 
+or should we introduce this new key under some other name like **"car-type"**?
+      
+Well, both would work, since in both cases we don't have same key name used.
+
+But what is nice about using **"--type--"** for entity type (CAR, PERSON)? Like:
+
+    { "--type--": "CAR",  "id": "zudza-da32dk-dfsd", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
+    
+Adding additional **--** characters in the name of such key (**"--type--"**) emphasizes that this key is somehow 
+different/special to other attributes and also makes collision with other attribute names very unlikely. 
+
+This data (entity type, ) is not one of entity's attributes, more like additional data about entity. We call such 
+data **meta data** - data about data.   
+
+So, our complete list would look something like this:
+   
+    [ 
+        { "--type--": "PERSON", "id": 23243, "name": "John Doe", "email": "john@gmail.com" }, 
+        { "--type--": "CAR",  "id": "zudza-da32dk-dfsd", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 },
+        { "--type--": "CAR", "id": "aabho-rrorz-43jjk", "type": "LIMOUSINE", "model": "Peugeot 206", "year": 2012 },
+        { "--type--": "PERSON", "id": 211, "name": "Rick Tracy", "email": "rick@facebook.com" }
+    ]
+
+Do we need such special "--type--" field if list contains only entities of same type, say person list?
+
+No, it is used solely for entity differentiation.
+
+---
+
 Now, let's get back to our complete person value:
 
     {
@@ -496,3 +609,4 @@ Now, let's get back to our complete person value:
 - date string into map
 - address string into map
 ### map "types"
+### Bytes as data type, binary vs textual representation
