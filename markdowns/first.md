@@ -504,16 +504,17 @@ as single line string, to be easier to read.
 ### Entity types
 
 We said earlier than a map is often used to represent some entity, such as a person, a company, a car, whatever.
-Imagine we have a list of such entities, such as a list of people:
+Imagine we have a list of such entities, such as a list of people, and each person has only 2 attributes - "name" and "email":
 
     [ 
         { "name": "John Doe", "email": "john@gmail.com" }, 
         { "name": "Johanna Smith", "email": "johanna@yahoo.com" },
         { "name": "Rick Tracy", "email": "rick@facebook.com" }
     ]
-It's easy to imagine some code that would read such a person list, and do something with it, like send email to each person element (a map) in the list
+It's easy to imagine some code that would read such a person list, and do something with it, like send email to each person in the list.
 
-But what if we have some **list of mixed entities**, let's say people **and** cars :
+But what if we have some **list of mixed entities**, let's say people **and** cars, and a car naturally has 
+different attributes ("model" and "year"):
 
     [ 
         { "name": "John Doe", "email": "john@gmail.com" }, 
@@ -536,28 +537,33 @@ What then?
 Hmmm, a problem, maybe by "year", or "email" key then?
 
 Yeah, but same problem with "name"/"model" is present here, you never know when different entities have same map keys, 
-or when they decide to rename it later. What about introducing special **type** key:
+or when they decide to rename it later. Good programming is much about introducing making explicit concepts that are important. 
+So, what about introducing special **type** key:
 
     [ 
         { "type": "PERSON", "name": "John Doe", "email": "john@gmail.com" }, 
         { "type": "CAR",  "model": "Ford C-Max", "year": 2009 },
-        { "type": "CAR", "model": "Peugeot 2006", "year": 2012 },
+        { "type": "CAR", "model": "Peugeot 3008", "year": 2012 },
         { "type": "PERSON", "name": "Rick Tracy", "email": "rick@facebook.com" }
     ]
 
-Differentiation is easy now, right? Now our code would look like:
+Differentiation is easy now, right? It doesn't depend on fragile entity attributes. 
+Now our code would look like:
 - if element's "type" equals "PERSON", send email with person information
 - if element's "type" equals "CAR", generate PDF file with car information
 
-If a car entity naturally has an **type** attribute that defines whether the car is SUV, limousine or some other type of vehicle?
+But... let's say a car entity, beside "model" and "year", also needs a **type** attribute that defines 
+whether the car is SUV, limousine or some other type of vehicle?
 Can we use name "type" for this new key that is specific only to car entity? Something like:
 
     { "type": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
 
 No, because a map cannot have multiple keys with same name, and "type" is already used for entity type differentiation.
 
-So, should we rename already present entity "type" key into something else, say "entity-type", 
-or should we introduce this new key under some other name like **"car-type"**?
+What shall we do then?
+
+Yes, rename the problematic keys. So, should we rename already present entity "type" key into something else, 
+say "entity-type", or should we introduce this new key under some other name like **"car-type"**?
 
     { "entity-type": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
 or    
@@ -566,7 +572,7 @@ or
       
 Well, both would work, since in both cases we don't have same key name used.
 
-But, let's say that we decide to rename "entity-type" into something like **"--type--"**? Like:
+But, let's say that we decide to rename "entity-type" into something like **"--type--"**:
 
     { "--type--": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
 
@@ -574,9 +580,14 @@ How likely is it that some entity in the list has same attribute name as **"--ty
 
 Very unlikely.
 
-And, this **"--type--"** data, is this data one of natural entity attributes (eg. person attributes, car attributes)? 
+Why?
 
-Well, no. it's more additional data attached to entity attributes, so our programs would easily differentiate entity type. 
+Well, these special dash characters (**--**) are not likely to appear in attributes names, so very little chance for collision.
+
+OK, well, that's a good thiong, right? And, this **"--type--"** data, is this data one of entity's 
+**natural attributes** (eg. person attributes, car attributes)? 
+
+Well, no. It's more additional data attached to entity attributes, so our programs would easily differentiate entity type. 
 Such data that additionally describe some other data, we call such data **meta data** - data about data.   
 
 So, our complete list would look something like this:
@@ -584,22 +595,48 @@ So, our complete list would look something like this:
     [ 
         { "--type--": "PERSON", "name": "John Doe", "email": "john@gmail.com" }, 
         { "--type--": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 },
-        { "--type--": "CAR", "type": "SUV", "model": "Peugeot 2006", "year": 2012 },
+        { "--type--": "CAR", "type": "SUV", "model": "Peugeot 3008", "year": 2012 },
         { "--type--": "PERSON", "name": "Rick Tracy", "email": "rick@facebook.com" }
     ]
 
-Again, do we need such special "--type--" key if a list contains only entities of same type, say person list?
+And if we separate this single list into 2 lists, each containing separate entity type (CAR, PERSON), 
+do we need this **--type--** key?
 
-No, it is used solely when list contains entities of different types.
+No, it was needed when list contains entities of different types.
+
 
 | --type-- | name       | email             | type      | model         | year |
 |----------|------------|-------------------|-----------|---------------|------|
 | PERSON   | John Doe   | john@gmail.com    |           |               |      |
 | CAR      |            |                   | LIMOUSINE | Ford C-Max    | 2009 |
-| CAR      |            |                   | SUV       | Peugeout 2006 | 2012 |
+| CAR      |            |                   | SUV       | Peugeot 3008  | 2012 |
 | PERSON   | Rick Tracy | rick@facebook.com |           |               |      |
 
+### Schema
 
+This **--type--** key in an entity map is actually very important in programming. 
+
+Taking again previous example in shorter form:
+
+    [ 
+        { "--type--": "PERSON", "name": "John Doe", "email": "john@gmail.com" }, 
+        { "--type--": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
+    ]
+
+If the value of this "--type--" key is "CAR", what keys we expect to be present in such map? And what are their data types?
+
+"type" (string), "model" (string), "year" (integer) of course. These are mandatory car attributes. 
+
+And if "--type--" is "PERSON"?
+
+"name" (string) and "email" (string).
+
+So we can say that specific "--type--" value is tied to:
+- set of allowed attributes
+- attribute data type
+- attribute optionality
+- other attribute constraints
+  
 
 ---
 
