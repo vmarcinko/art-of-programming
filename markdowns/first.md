@@ -507,19 +507,19 @@ We said earlier than a map is often used to represent some entity, such as a per
 Imagine we have a list of such entities, such as a list of people:
 
     [ 
-        { "id": 23243, "name": "John Doe", "email": "john@gmail.com" }, 
-        { "id": 6613, "name": "Johanna Smith", "email": "johanna@yahoo.com" },
-        { "id": 211, "name": "Rick Tracy", "email": "rick@facebook.com" }
+        { "name": "John Doe", "email": "john@gmail.com" }, 
+        { "name": "Johanna Smith", "email": "johanna@yahoo.com" },
+        { "name": "Rick Tracy", "email": "rick@facebook.com" }
     ]
 It's easy to imagine some code that would read such a person list, and do something with it, like send email to each person element (a map) in the list
 
 But what if we have some **list of mixed entities**, let's say people **and** cars :
 
     [ 
-        { "id": 23243, "name": "John Doe", "email": "john@gmail.com" }, 
-        { "id": "zudza-da32dk-dfsd", "model": "Ford C-Max", "year": 2009 },
-        { "id": "aabho-rrorz-43jjk", "model": "Peugeot 206", "year": 2012 },
-        { "id": 211, "name": "Rick Tracy", "email": "rick@facebook.com" }
+        { "name": "John Doe", "email": "john@gmail.com" }, 
+        { "model": "Ford C-Max", "year": 2009 },
+        { "model": "Peugeot 206", "year": 2012 },
+        { "name": "Rick Tracy", "email": "rick@facebook.com" }
     ]
 
 Now, imagine some code would read this list, loop over it, and for each element do some type-specific action:
@@ -539,10 +539,10 @@ Yeah, but same problem with "name"/"model" is present here, you never know when 
 or when they decide to rename it later. What about introducing special **type** key:
 
     [ 
-        { "type": "PERSON", "id": 23243, "name": "John Doe", "email": "john@gmail.com" }, 
-        { "type": "CAR",  "id": "zudza-da32dk-dfsd", "model": "Ford C-Max", "year": 2009 },
-        { "type": "CAR", "id": "aabho-rrorz-43jjk", "model": "Peugeot 206", "year": 2012 },
-        { "type": "PERSON", "id": 211, "name": "Rick Tracy", "email": "rick@facebook.com" }
+        { "type": "PERSON", "name": "John Doe", "email": "john@gmail.com" }, 
+        { "type": "CAR",  "model": "Ford C-Max", "year": 2009 },
+        { "type": "CAR", "model": "Peugeot 2006", "year": 2012 },
+        { "type": "PERSON", "name": "Rick Tracy", "email": "rick@facebook.com" }
     ]
 
 Differentiation is easy now, right? Now our code would look like:
@@ -552,37 +552,54 @@ Differentiation is easy now, right? Now our code would look like:
 If a car entity naturally has an **type** attribute that defines whether the car is SUV, limousine or some other type of vehicle?
 Can we use name "type" for this new key that is specific only to car entity? Something like:
 
-    { "type": "CAR",  "id": "zudza-da32dk-dfsd", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
+    { "type": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
 
 No, because a map cannot have multiple keys with same name, and "type" is already used for entity type differentiation.
 
-So, should we rename already present entity "type" key into something else, say **"--type--"**, 
+So, should we rename already present entity "type" key into something else, say "entity-type", 
 or should we introduce this new key under some other name like **"car-type"**?
+
+    { "entity-type": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
+or    
+    
+    { "type": "CAR", "car-type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
       
 Well, both would work, since in both cases we don't have same key name used.
 
-But what is nice about using **"--type--"** for entity type (CAR, PERSON)? Like:
+But, let's say that we decide to rename "entity-type" into something like **"--type--"**? Like:
 
-    { "--type--": "CAR",  "id": "zudza-da32dk-dfsd", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
-    
-Adding additional **--** characters in the name of such key (**"--type--"**) emphasizes that this key is somehow 
-different/special to other attributes and also makes collision with other attribute names very unlikely. 
+    { "--type--": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
 
-This data (entity type, ) is not one of entity's attributes, more like additional data about entity. We call such 
-data **meta data** - data about data.   
+How likely is it that some entity in the list has same attribute name as **"--type--"**?
+
+Very unlikely.
+
+And, this **"--type--"** data, is this data one of natural entity attributes (eg. person attributes, car attributes)? 
+
+Well, no. it's more additional data attached to entity attributes, so our programs would easily differentiate entity type. 
+Such data that additionally describe some other data, we call such data **meta data** - data about data.   
 
 So, our complete list would look something like this:
    
     [ 
-        { "--type--": "PERSON", "id": 23243, "name": "John Doe", "email": "john@gmail.com" }, 
-        { "--type--": "CAR",  "id": "zudza-da32dk-dfsd", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 },
-        { "--type--": "CAR", "id": "aabho-rrorz-43jjk", "type": "LIMOUSINE", "model": "Peugeot 206", "year": 2012 },
-        { "--type--": "PERSON", "id": 211, "name": "Rick Tracy", "email": "rick@facebook.com" }
+        { "--type--": "PERSON", "name": "John Doe", "email": "john@gmail.com" }, 
+        { "--type--": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 },
+        { "--type--": "CAR", "type": "SUV", "model": "Peugeot 2006", "year": 2012 },
+        { "--type--": "PERSON", "name": "Rick Tracy", "email": "rick@facebook.com" }
     ]
 
-Do we need such special "--type--" field if list contains only entities of same type, say person list?
+Again, do we need such special "--type--" key if a list contains only entities of same type, say person list?
 
-No, it is used solely for entity differentiation.
+No, it is used solely when list contains entities of different types.
+
+| --type-- | name       | email             | type      | model         | year |
+|----------|------------|-------------------|-----------|---------------|------|
+| PERSON   | John Doe   | john@gmail.com    |           |               |      |
+| CAR      |            |                   | LIMOUSINE | Ford C-Max    | 2009 |
+| CAR      |            |                   | SUV       | Peugeout 2006 | 2012 |
+| PERSON   | Rick Tracy | rick@facebook.com |           |               |      |
+
+
 
 ---
 
