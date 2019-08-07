@@ -234,9 +234,15 @@ It's still 5, since a set doesn't allow duplicates, and we already have element 
 Currently, again, as with case with strings and other data types, we don't have textual way to differentiate between a list and a set, 
 so let's introduce special characters for that, **[ el1, el2, ... ]** for a list, and **#{ el1, el2, ... }** for a set, something like:
 
-
      [ 22, 3, -300, 0, 1 ]      (list)
     #{ 22, 3, -300, 0, 1 }      (set)
+
+Can a list or set have no elements?
+
+Of course, here they are:
+
+     [ ]      (empty list)
+    #{ }      (empty set)
     
 ---
 
@@ -249,7 +255,7 @@ Let's say we have a following person data, such as:
     "age":        56,
     "employed":   true
 
-You notice that this complex piece of data has **key-value**, or **name-value**, structure. Each key/name has a value associated with it.  
+You notice that this complex piece of data has **key-value**, or **name-value**, structure. Each **key (name)** has a **value** associated with it.  
 We call such data type a **map**, and it is another collection data type we introduced (previous ones are list and set).
 
 Actually, for same reason already mentioned in case of **string, list or set**, let's use some special characters to 
@@ -295,18 +301,51 @@ What's value under key "name", and what is its type?
 
 It's "John Doe", and it's a string.
 
-Let's say a person has multiple nicknames, say
+And if we want to introduce new "nickname" attribute, what type it would be?
+
+A string of course, something like:
+
+    {
+        "id":         4413,
+        "name":       "John Doe",
+        "age":        56,
+        "employed":   true,
+        "nickname":   "Johny"
+    }
+
+But some people don't have a nickname - how will we represent that then? Should we just omit this "nickname" key then?
+
+Yes, that's one possibility. But if we decide to keep this key, what do we need then?
+
+Some special value that means "nothing" - a **null** (or **nil** sometimes) is mostly used for that:
+
+    {
+        "id":         4413,
+        "name":       "John Doe",
+        "age":        56,
+        "employed":   true,
+        "nickname":   null
+    }
+
+Such attributes that can have no value we call **optional** attributes. 
+  
+But, as we know, a person can have also multiple nicknames, say
 
     "Johny", "BigJ", "Maverick"
-    
-, we have to decide what data type will we use...
-Should it be one of collection data types (list, set, map) or a primitive (boolean, string, number...)?
 
-Definitely a collection, because we have multiple nicknames, not just a single value.
+Do we need to change the name of "nickname" key?    
+
+Of course, it should be "nicknames" now, instead of "nickname"! Names are really important in programming, 
+they should always reflect their meaning.
+
+And what about its data type? Should it be one of collection data types (list, set, map) 
+or a primitive (boolean, string, number...)?
+
+Definitely a collection, because we have multiple nicknames (*Johny, BigJ, Maverick*), not just a single value.
 
 OK, so some collection is needed here. Should it be a map? Why?
 
-Not a map, because map is of key-value structure, and here we just have multiple values (*Johny, BigJ, Maverick*), 
+Not a map, because map is of key-value structure, and here we just have multiple values, 
 we don't have a need for keys here.
 
 So - it comes down to a list or a set ? Which one?
@@ -342,7 +381,24 @@ But since we use a list now, can it happen that creator of such data mistakenly 
 ?
 
 Ahhh, yes, that would be bad, unlike a set, a list allows duplicates. Well, I guess this is the trade-off, and we only have 
-a set or a list to pick from. 
+a set or a list to pick from.
+
+Let's go back to using a **set** for nicknames:
+
+        "nicknames":  #{ "Johny", "BigJ", "Maverick" }
+
+If a person doesn't have any nickname, how would we represent that?
+- with **no key** ("nicknames") within a person map
+- with **null** value - `"nicknames": null`
+- with **empty set** value - `"nicknames": #{ }`
+ 
+Actually, all 3 options would work, but... 
+First 2 options would require additional description for anyone who reads the data to know what is the meaning of null value (or no key),  
+whereas 3rd options is best one because empty set is normal value with already sufficiently precise meaning - no elements present in the set, so it would be best option. 
+
+So rule of a thumb is:
+
+    An empty list (or a set) should be preferred to null value to represent no elements in collection
 
 Let's move on ... What do you think, can a **map** contain **another map** inside?
 
@@ -362,6 +418,16 @@ For example, say we add a **spouse** attribute to our person:
                         "employed":   false
                       }
     }
+
+And is a "spouse" attribute optional or not?
+
+Marriage is optional, so I guess this attribute is optional also :-)
+
+How would we represent that a person has no spouse?
+
+With **null** value, or without "spouse" key, something like:
+
+    "spouse": null 
 
 As we said, map is a **key-value** data structure, and as in previous "person" example, 
 a map is very often used to represent some **entity** which has its **attributes** (such as person with its attributes).
@@ -584,7 +650,7 @@ Why?
 
 Well, these special dash characters (**--**) are not likely to appear in attributes names, so very little chance for collision.
 
-OK, well, that's a good thiong, right? And, this **"--type--"** data, is this data one of entity's 
+OK, well, that's a good thing, right? And, this **"--type--"** data, is this data one of entity's 
 **natural attributes** (eg. person attributes, car attributes)? 
 
 Well, no. It's more additional data attached to entity attributes, so our programs would easily differentiate entity type. 
@@ -614,18 +680,18 @@ No, it was needed when list contains entities of different types.
 
 ### Schema
 
-This **--type--** key in an entity map is actually very important in programming. 
+This **"--type--"** key in an entity map is actually very important in programming. 
 
 Taking again previous example in shorter form:
 
     [ 
         { "--type--": "PERSON", "name": "John Doe", "email": "john@gmail.com" }, 
-        { "--type--": "CAR", "type": "LIMOUSINE", "model": "Ford C-Max", "year": 2009 }
+        { "--type--": "CAR", "model": "Ford C-Max", "year": 2009 }
     ]
 
 If the value of this "--type--" key is "CAR", what keys we expect to be present in such map? And what are their data types?
 
-"type" (string), "model" (string), "year" (integer) of course. These are mandatory car attributes. 
+"model" (string) and "year" (integer) of course. These are mandatory car attributes. 
 
 And if "--type--" is "PERSON"?
 
@@ -656,7 +722,6 @@ Now, let's get back to our complete person value:
         "employed":       true
     }
 
-### Map key optionality - null, empty list or set
 ### Flattening nested map
 ### Reshaping data for better usability
 - list into map as index
