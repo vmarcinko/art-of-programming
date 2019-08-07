@@ -272,6 +272,12 @@ So, how many **keys** (person **attributes**) does the person map above has?
 
 There are 4. It's **id, name, age, employed**.
 
+And what are keys in this map?
+
+    { "id": 4413, "name": "John Doe", "age": 56, "employed": true }
+
+It's **id, name, age, employed** again, it's the same map, just written in single line.
+
 And what is data type of these keys - id, name, age...? (warning - question is about key type, not value type)
 
 It's a string.
@@ -350,7 +356,7 @@ we don't have a need for keys here.
 
 So - it comes down to a list or a set ? Which one?
 
-Well, both would work, but a set would suit better, because we don't want duplicates here 
+Well, both would work, but a **set** would suit better, because we don't want duplicates here 
 (same nicknames duplicated - such as *Johny, BigJ, Maverick, BigJ*), and we don't care about ordering/positions when we read it.
 
 So if we add "nicknames" set attribute to a person map, we will end up with following map value:
@@ -366,7 +372,7 @@ So if we add "nicknames" set attribute to a person map, we will end up with foll
 What if we wanted to specify person nicknames, but in order of importance, so that first is the most used, and the last one is least used nickname.
 What data type would you use for such "nicknames" attribute ?
 
-Well, the list is needed then, because someone who reads this data later will need to know what the order of nicknames in a list, otherwise, it wouldn't know which one is more important. 
+Well, the **list** is needed then, because someone who reads this data later will need to know what the order of nicknames in a list, otherwise, it wouldn't know which one is more important. 
 Ordering is very important in such example. So instead of:
 
     "nicknames":  #{ "Johny", "BigJ", "Maverick" }
@@ -670,7 +676,6 @@ do we need this **--type--** key?
 
 No, it was needed when list contains entities of different types.
 
-
 | --type-- | name       | email             | type      | model         | year |
 |----------|------------|-------------------|-----------|---------------|------|
 | PERSON   | John Doe   | john@gmail.com    |           |               |      |
@@ -682,6 +687,131 @@ No, it was needed when list contains entities of different types.
 
 This **"--type--"** key in an entity map is actually very important in programming. 
 
+Imagine someone writes down this kind of "CAR" value:
+
+     { 
+        "--type--":     "CAR",
+        "model":        "Ford C-Max", 
+        "year":         true 
+     }
+
+Just looking at a syntax, is this a **correctly written** map value?
+
+Yes. Curly braces are here (**{ }**), we have a **key-value** structure, etc...
+
+What is the type of "year" key (attribute)?
+
+A boolean.
+
+Is there anything that prevents someone using a boolean value for a "year" key in a map?
+
+No.
+
+Looking at following car map example:
+
+     { 
+         "--type--":    "CAR", 
+         "model":       "Ford C-Max", 
+         "has-wife":    true 
+     }
+
+Is there some **expected** key missing?
+
+Yes, a "year".
+
+And does "has-wife" attribute make any sense in this car example?
+
+No.
+
+Imagine you have a program that reads car map values written elsewhere. What would you like to happen 
+when your program reads some unexpected car examples as above?
+
+Well, it would be nice to check/validate whether such map value conforms to expectations about CAR maps, 
+and report an error is it does not.
+  
+Let's bring back original example:
+
+    { 
+        "--type--":     "CAR", 
+        "model":        "Ford C-Max", 
+        "year":         2009 
+    }
+
+If the value of this "--type--" key is "CAR", what keys we **expect** to be present in such a map? 
+
+"model" and "year".
+
+What are their respective data types?
+
+A string ("model") and integer ("year").
+
+And what about optionality? What keys are optional?
+
+Well, we never explicitly talked about it, but since we never used **null** for any such car map example, 
+I guess both of them are mandatory (not optional). 
+
+OK, so we can say that **definition of "CAR" type** is consists of following set of keys:
+- "model" - string, not optional
+- "year" - integer, not optional
+
+This kind of type definition is frequently called a **schema**.
+
+For a moment, don't think how would we define it, but such a type definition, or a schema as we call it, 
+what would it be good for? 
+
+To be used for validation of car values (represented as maps).
+
+#### Java programming language
+
+Java, as most of modern statically-typed languages, uses **classes** as a schema, as a type definition.
+
+So, if we want to specify "schema" for a car, having 2 attributes: model (string) and a year (integer), we create a Car class such as this:
+
+```java
+public class Car {
+	public String model;
+	public int year;
+}
+```
+
+You can see how we specified 2 attributes, and their types (string and integer).
+
+And then try to create invalid car value out of it, such as this:
+
+ ```java
+		Car carValue1 = new Car();
+		carValue1.model = "Ford C-Max";
+		carValue1.year = true;
+```
+
+Whn does validation of a car value written as above happens in Java language?
+
+During compilation! It would fail with some message as following:
+
+        incompatible types: boolean cannot be converted to int
+
+Attribute "year" is defined in Car class such as this:
+
+    	public int year;
+
+Is there some definition here that would say it is mandatory (not optional)?
+
+No, currently Java does not have to specify that explicitly. It just defines what type it is.
+
+So, should this Car value creation pass compiler check?
+ 
+```java
+		Car carValue1 = new Car();
+		carValue1.model = "Ford C-Max";
+```
+
+Yes, unfortunately.
+
+#### SQL
+
+#### XML
+
+
 Taking again previous example in shorter form:
 
     [ 
@@ -689,20 +819,7 @@ Taking again previous example in shorter form:
         { "--type--": "CAR", "model": "Ford C-Max", "year": 2009 }
     ]
 
-If the value of this "--type--" key is "CAR", what keys we expect to be present in such map? And what are their data types?
 
-"model" (string) and "year" (integer) of course. These are mandatory car attributes. 
-
-And if "--type--" is "PERSON"?
-
-"name" (string) and "email" (string).
-
-So we can say that specific "--type--" value is tied to:
-- set of allowed attributes
-- attribute data type
-- attribute optionality
-- other attribute constraints
-  
 
 ---
 
