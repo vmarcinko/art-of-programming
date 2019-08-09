@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<car xmlns="http://www.mycompany.me/car">
+    <model>Ford C-Max</model>
+<!--    <year>2009</year>-->
+</car>

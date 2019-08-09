@@ -748,11 +748,17 @@ A string ("model") and integer ("year").
 And what about optionality? What keys are optional?
 
 Well, we never explicitly talked about it, but since we never used **null** for any such car map example, 
-I guess both of them are mandatory (not optional). 
+I guess both of them are mandatory (not optional).
+
+And is this valid year value?
+
+        "year":         -150 
+
+Well, year in general can be negative (B.C.), but let's say we don't want to allow that here.
 
 OK, so we can say that **definition of "CAR" type** is consists of following set of keys:
 - "model" - string, not optional
-- "year" - integer, not optional
+- "year" - integer, not optional, only positive number
 
 This kind of type definition is frequently called a **schema**.
 
@@ -760,6 +766,113 @@ For a moment, don't think how would we define it, but such a type definition, or
 what would it be good for? 
 
 To be used for validation of car values (represented as maps).
+
+Programs read data to to process it, to do something with it. Data validation is usually done immediately 
+**after** reading the data, **before** processing it. Why?
+
+To catch potential error in data as soon as possible, because the processing code can fail 
+later due to invalid data and sometimes it's not easy to spot the cause and is much more costly to fix.
+
+#### XML
+
+Let's take a look at following XML data:
+
+```xml
+<car>
+    <model>Ford C-Max</model>
+    <year>2009</year>
+</car>
+```
+Does XML format reminds you a bit of a map ? Why? 
+ 
+Yes, it also has a map-like **key-value** structure, but in XML world, we don't call 
+entries **key-value**, but **XML elements**. Each XML element has a name and a value, 
+such as `<model>Ford C-Max</model>`or `<year>2009</year>`.
+
+Each XML must start with a root XML element, here it is a `<car>`. Do we have something like that in map?
+
+No, a map doesn't have a root name/key/whatever, it just starts with curly braces **{ }**.
+
+But still, this root XML element `car`, what does it reminds you of?
+
+It's a bit like our **"--type--"** key! It is like a type name - CAR in this example.  
+
+XML world has a way to define a **schema** for XML data, such as car XML example given above, 
+and it's called **XML Schema**. Here's example for our car type definition:
+
+```xml
+<xs:schema targetNamespace="http://www.mycompany.me/car" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="car">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="model" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="year" type="xs:integer" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
+```  
+ID of XML Schema above is `http://www.mycompany.me/car`, and in XML world, it's called a **namespace**.
+
+Looking at this piece which defines "year" XML element:
+
+    <xs:element name="year" type="xs:integer" minOccurs="1" maxOccurs="1"/>
+
+What does `type="xs:integer"` defines?
+
+That "year" XML element must have **integer** value.
+
+And what about `minOccurs="1" maxOccurs="1"`, what does that means?
+
+That this element has to occur at least 1 time, and at most 1 time, which effectively means it is **required**!
+
+And now we only change our car XML data to reference this schema by its ID (`http://www.mycompany.me/car`):
+
+```xml
+<car xmlns="http://www.mycompany.me/car">
+    <model>Ford C-Max</model>
+    <year>2009</year>
+</car>
+```
+
+Is this valid XML data above?
+
+Well, it looks so.
+
+And this one, is this valid XML?
+
+```xml
+<car xmlns="http://www.mycompany.me/car">
+    <model>Ford C-Max</model>
+    <year>-140</year>
+</car>
+```
+
+No, since year is negative, and we said we would not allow negative years.
+
+But looking at XML Schema definition for `<year>` XML element:
+
+    <xs:element name="year" type="xs:integer" minOccurs="1" maxOccurs="1"/>
+  
+Does it prevent negative values?
+
+No, negative integer is allowed by this XML Schema. So how will we validate that value?
+
+Well, we can do 2 things:
+- try to see whether XML Schema has possibility to specify constraints on negative number
+- validate manually within the code
+
+Actually, XML Schema is quite rich standard, so it has such possibility:
+
+```xml   
+<xs:element name="year" minOccurs="1" maxOccurs="1">
+    <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="0"/>
+        </xs:restriction>
+      </xs:simpleType>
+</xs:element>
+```
 
 #### Java programming language
 
@@ -796,7 +909,7 @@ Attribute "year" is defined in Car class such as this:
 
 Is there some definition here that would say it is mandatory (not optional)?
 
-No, currently Java does not have to specify that explicitly. It just defines what type it is.
+No, currently Java cannot specify that directly. It just defines what type it is.
 
 So, should this Car value creation pass compiler check?
  
@@ -808,9 +921,6 @@ So, should this Car value creation pass compiler check?
 Yes, unfortunately.
 
 #### SQL
-
-#### XML
-
 
 Taking again previous example in shorter form:
 
@@ -846,3 +956,5 @@ Now, let's get back to our complete person value:
 - address string into map
 ### map "types"
 ### Bytes as data type, binary vs textual representation
+
+## Type system Comparison table - xml, java, json, map, sql
