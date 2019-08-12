@@ -959,9 +959,9 @@ You can see how we specified 2 attributes, and their types (string and integer).
 And then try to create invalid car value out of it, such as this:
 
  ```java
-		Car carValue1 = new Car();
-		carValue1.model = "Ford C-Max";
-		carValue1.year = true;
+		Car car1 = new Car();
+		car1.model = "Ford C-Max";
+		car1.year = true;
 ```
 
 Whn does validation of a car value written as above happens in Java language?
@@ -987,6 +987,15 @@ So, should this Car value creation pass compiler check?
 
 Yes, unfortunately.
 
+### Comparison
+
+|      | map value | map key      | map key value    | schema           |
+|------|-----------|--------------|------------------|------------------|
+| JSON | json      | name         | value            |                  |
+| CSV  | csv row   | column       | row column value |                  |
+| XML  | xml       | element name | element value    | XML Schema       |
+| SQL  | table row | column       | row column value | table definition |
+| Java | object    | field        | field value      | class            |
 
 ### Garbage
 
@@ -996,9 +1005,6 @@ Taking again previous example in shorter form:
         { "--type--": "PERSON", "name": "John Doe", "email": "john@gmail.com" }, 
         { "--type--": "CAR", "model": "Ford C-Max", "year": 2009 }
     ]
-
-
-
 ---
 
 Now, let's get back to our complete person value:
