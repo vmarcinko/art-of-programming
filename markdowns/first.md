@@ -785,8 +785,8 @@ Let's take a look at following XML data:
 ```
 Does XML format reminds you a bit of a map ? Why? 
  
-Yes, it also has a map-like **key-value** structure, but in XML world, we don't call 
-entries **key-value**, but **XML elements**. Each XML element has a name and a value, 
+Yes, it also has a **key-value** structure like a map, but in XML world, we don't call 
+entries **key-value**, but **XML elements**. Each XML element has a name (key) and a value, 
 such as `<model>Ford C-Max</model>`or `<year>2009</year>`.
 
 Each XML must start with a root XML element, here it is a `<car>`. Do we have something like that in map?
@@ -797,8 +797,8 @@ But still, this root XML element `car`, what does it reminds you of?
 
 It's a bit like our **"--type--"** key! It is like a type name - CAR in this example.  
 
-XML world has a way to define a **schema** for XML data, such as car XML example given above, 
-and it's called **XML Schema**. Here's example for our car type definition:
+XML world has a way to define a **schema** for XML data and it's called **XML Schema**. 
+Here's a schema example that we use to define car "type" (`<car>` XML element):
 
 ```xml
 <xs:schema targetNamespace="http://www.mycompany.me/car" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
@@ -812,9 +812,9 @@ and it's called **XML Schema**. Here's example for our car type definition:
     </xs:element>
 </xs:schema>
 ```  
-ID of XML Schema above is `http://www.mycompany.me/car`, and in XML world, it's called a **namespace**.
+ID of XML Schema above is `http://www.mycompany.me/car`, and in XML world, this ID is called a **namespace**.
 
-Looking at this piece which defines "year" XML element:
+Looking at this piece of schema which defines "year" XML element:
 
     <xs:element name="year" type="xs:integer" minOccurs="1" maxOccurs="1"/>
 
@@ -826,7 +826,7 @@ And what about `minOccurs="1" maxOccurs="1"`, what does that means?
 
 That this element has to occur at least 1 time, and at most 1 time, which effectively means it is **required**!
 
-And now we only change our car XML data to reference this schema by its ID (`http://www.mycompany.me/car`):
+And now we only change our car XML data to reference this schema by its namespace (`http://www.mycompany.me/car`):
 
 ```xml
 <car xmlns="http://www.mycompany.me/car">
@@ -859,10 +859,10 @@ Does it prevent negative values?
 No, negative integer is allowed by this XML Schema. So how will we validate that value?
 
 Well, we can do 2 things:
-- try to see whether XML Schema has possibility to specify constraints on negative number
-- validate manually within the code
+- validate with XML Schema if it has necessary feature
+- validate with the custom code
 
-Actually, XML Schema is quite rich standard, so it has such possibility:
+Actually, XML Schema is quite rich technology, so it has such possibility:
 
 ```xml   
 <xs:element name="year" minOccurs="1" maxOccurs="1">
@@ -872,6 +872,73 @@ Actually, XML Schema is quite rich standard, so it has such possibility:
         </xs:restriction>
       </xs:simpleType>
 </xs:element>
+```
+
+#### SQL
+
+Let's say we have "CAR" table within some SQL database, and it has following data: 
+
+| model         | year |
+|---------------|------|
+| Ford C-Max    | 2009 |
+| Peugeot 3008  | 2012 |
+| Peugeot 206   | 2001 |
+
+Do you see some similarities here with a **map** data type ? Why?
+
+Well, **table column** is similar to **map key**, and **record/row value** is same as **value** associated with the key. Such as:
+
+    { "model": "Ford C-Max", "year": 2009 }
+
+But table can have many rows. And if we say that single table row is like a map, what is whole table then?
+
+It's a collection of maps, something like **set of maps**, or **list of maps**, something like:. 
+
+    [
+        { "model": "Ford C-Max",    "year": 2009 },
+        { "model": "Peugeot 3008",  "year": 2012 },
+        { "model": "Peugeot 206",   "year": 2001 }
+    ]
+
+And in SQL table, is it possible to have some invalid value, such as invalid "year" value:
+
+| model         | year |
+|---------------|------|
+| Ford C-Max    | 2009 |
+| Peugeot 3008  | 2012 |
+| Peugeot 206   | aaab |
+
+?
+
+No, it's not possible, because definition of SQL table prevents that.
+
+OK, so let's say that "car" table given above is created with following statement:
+
+```sql
+CREATE TABLE car (
+    model   VARCHAR(200)    NOT NULL, 
+    year    INTEGER         NOT NULL
+);
+```
+
+we can see that SQL table definition consists of:
+ - set of possible columns
+ - column data type
+ - column optionality
+ 
+Does this reminds you of something?
+
+Yes, a **schema**! SQL table is basically a schema that prevents invalid map data (row) to be inserted in it.
+
+Each SQL table, which we 
+
+How do we insert new map data (row) into SQL table?
+
+Using SQL INSERT command, such as:
+
+```sql
+INSERT INTO car (model, year) VALUES ('Ford C-Max', 2009);
+INSERT INTO car (model, year) VALUES ('Peugeot 208', 2017);
 ```
 
 #### Java programming language
@@ -920,7 +987,8 @@ So, should this Car value creation pass compiler check?
 
 Yes, unfortunately.
 
-#### SQL
+
+### Garbage
 
 Taking again previous example in shorter form:
 
@@ -949,7 +1017,9 @@ Now, let's get back to our complete person value:
         "employed":       true
     }
 
-### Flattening nested map
+### Flattening nested map into tabular data (SQL?)
+### CSV, Excel vs SQL?
+
 ### Reshaping data for better usability
 - list into map as index
 - date string into map
