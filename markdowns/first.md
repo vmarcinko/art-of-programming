@@ -590,9 +590,20 @@ If we decide to use richer data type, such as a map, how would you specify some 
 
 Something like "year", "month", "day". Like: `{ "year": 1994, "month": 05, "day": 6 }`
 
-And again, what is the downside of using the map?
+Now the code that reads this piece of data has much easier job of validating the date value, why?
 
-Compared to string, it's not so compact anymore, and also it effects readability, especially if we can use some date string format 
+It doesn't have to parse "year", "month" and "day" value from a string manually, because these date parts are already separated as map keys. 
+
+But it has to do some other validation, even with a date as a map? What should the reader code validate in such "date map":
+
+It has to check that:
+- all 3 keys exist (year, month, day)
+- all 3 keys have integer value
+- all integer values are within acceptable range (month is between 1-12, and day between 1-31).
+
+And again, compared to string, a map has some downside, what is it?
+
+It's not so compact anymore, and also it effects readability, especially if we can use some date string format 
 which is standardized, eg. `"1994-06-05" (year-month-day)`. And all mainstream languages have pretty good support for date & timestamp 
 parsing, so it's not such a big burden to parse it in the code usually.
 
