@@ -594,7 +594,7 @@ Something like "year", "month", "day". Like:
 "birthday": { "year": 1994, "month": 5, "day": 6 }
 ```
 
-Now the code that reads this piece of data has much easier job of validating the date value, why?
+Now the code that reads this piece of data has much easier job of reading the date value, why?
 
 It doesn't have to parse "year", "month" and "day" value from a string manually, because these date parts are already separated as map keys. 
 
@@ -608,8 +608,9 @@ It has to check that:
 And again, compared to string, a map has some downside, what is it?
 
 It's not so compact anymore, and also it effects readability, especially if we can use some date string format 
-which is standardized, eg. `"1994-06-05" (year-month-day)`. And all mainstream languages have pretty good support for date & timestamp 
-parsing, so it's not such a big burden to parse it in the code usually.
+which is standardized, eg. `"1994-06-05" (year-month-day)`. And all mainstream languages have pretty good support for date/timestamp 
+parsing which immediately check whether all other constraints on date parts are met (month/day number range etc...), 
+so it's not such a big burden to parse it in the code usually.
 
 So as often is the case, programming is all about trade-offs, choose wisely :) 
 
