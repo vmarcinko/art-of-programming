@@ -588,7 +588,11 @@ The reader has to know somehow the format used to represent the date, and use it
 
 If we decide to use richer data type, such as a map, how would you specify some date using it? What keys would it contain?
 
-Something like "year", "month", "day". Like: `{ "year": 1994, "month": 05, "day": 6 }`
+Something like "year", "month", "day". Like: 
+
+```json
+"birthday": { "year": 1994, "month": 5, "day": 6 }
+```
 
 Now the code that reads this piece of data has much easier job of validating the date value, why?
 
