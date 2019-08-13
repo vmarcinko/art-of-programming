@@ -676,13 +676,6 @@ do we need this **--type--** key?
 
 No, it was needed when list contains entities of different types.
 
-| --type-- | name       | email             | type      | model         | year |
-|----------|------------|-------------------|-----------|---------------|------|
-| PERSON   | John Doe   | john@gmail.com    |           |               |      |
-| CAR      |            |                   | LIMOUSINE | Ford C-Max    | 2009 |
-| CAR      |            |                   | SUV       | Peugeot 3008  | 2012 |
-| PERSON   | Rick Tracy | rick@facebook.com |           |               |      |
-
 ### Schema
 
 This **"--type--"** key in an entity map is actually very important in programming. 
@@ -772,6 +765,46 @@ Programs read data to to process it, to do something with it. Data validation is
 
 To catch potential error in data as soon as possible, because the processing code can fail 
 later due to invalid data and sometimes it's not easy to spot the cause and is much more costly to fix.
+
+#### JSON
+
+JSON if very popular data format currently, and we intentionally picked syntax for our data format to be 
+almost exactly equal to JSON.
+
+How is called JSON data type for string values (eg.`"John"`)?
+
+A string.
+
+And what is JSON data type for boolean (eg. `false`)?
+
+A boolean also.
+
+And JSON equivalent for a list, for example:
+
+    [ "john", "bob", "andy", "john" ]
+    
+?
+    
+It's called **JSON array**.
+
+And JSON equivalent for a map?
+
+    {
+        "name": "John",
+        "age":  57
+    }
+    
+It's called **JSON object**.
+
+And what is JSON equivalent for a set, such as:
+
+    #{ "john", "bob", "andy" }
+    
+There is no such data type in JSON, only array for collection, but it does not guarantee element uniqueness which set does.
+
+Is there some schema technology for JSON data, that would provide validation to data written in such format?
+
+There are some that can be found around, but not official one. JSON was not initially designed with schema in mind.  
 
 #### XML
 
@@ -874,9 +907,39 @@ Actually, XML Schema is quite rich technology, so it has such possibility:
 </xs:element>
 ```
 
+#### CSV (Comma Separated Values)
+
+CSV format, although very old, is still quite popular data format. Here's an example: 
+
+```
+#model;year
+Ford C-Max;2009
+Peugeot 3008;2012
+Peugeot 206;2001
+```
+
+What delimiter character is used for separating the values ?
+
+It's semicolon, though other characters can also be used, such as comma, or colon, or whatever.
+
+Does this reminds you of a map? Why?
+
+Well yes, it's kinda map also. CSV fields (columns) are kind of map keys, and rows contain separated values of those keys.
+
+Is there any schema technology to prevent invalid values here, such as:
+```
+#model;year
+Ford C-Max;2009
+2012
+Peugeot 206
+```
+
+Unfortunately no.
+
+
 #### SQL
 
-Let's say we have "CAR" table within some SQL database, and it has following data: 
+Let's say we have **"car" table** within some SQL database, and it has following data: 
 
 | model         | year |
 |---------------|------|
@@ -886,13 +949,13 @@ Let's say we have "CAR" table within some SQL database, and it has following dat
 
 Do you see some similarities here with a **map** data type ? Why?
 
-Well, **table column** is similar to **map key**, and **record/row value** is same as **value** associated with the key. Such as:
+Well, **table column** is similar to **map key**, and **record (row) value** is same as **value** associated with the key. Such as:
 
     { "model": "Ford C-Max", "year": 2009 }
 
-But table can have many rows. And if we say that single table row is like a map, what is whole table then?
+But table can have many rows. And if we say that single table record is like a map, what is whole table then?
 
-It's a collection of maps, something like **set of maps**, or **list of maps**, something like:. 
+It's a collection of maps, like **list (or set) of maps**, something like:. 
 
     [
         { "model": "Ford C-Max",    "year": 2009 },
@@ -900,7 +963,7 @@ It's a collection of maps, something like **set of maps**, or **list of maps**, 
         { "model": "Peugeot 206",   "year": 2001 }
     ]
 
-And in SQL table, is it possible to have some invalid value, such as invalid "year" value:
+And in SQL table, is it possible to have some invalid value, such as invalid "year" value within our "car" table:
 
 | model         | year |
 |---------------|------|
@@ -910,7 +973,7 @@ And in SQL table, is it possible to have some invalid value, such as invalid "ye
 
 ?
 
-No, it's not possible, because definition of SQL table prevents that.
+No, it's not possible, because definition of SQL table prevents such records.
 
 OK, so let's say that "car" table given above is created with following statement:
 
@@ -924,15 +987,13 @@ CREATE TABLE car (
 we can see that SQL table definition consists of:
  - set of possible columns
  - column data type
- - column optionality
+ - column optionality (null or not null)
  
 Does this reminds you of something?
 
-Yes, a **schema**! SQL table is basically a schema that prevents invalid map data (row) to be inserted in it.
+Yes, a **schema**! SQL table is basically a schema that prevents invalid map data (table record) to be present in it.
 
-Each SQL table, which we 
-
-How do we insert new map data (row) into SQL table?
+How do we insert new table record (map data) into SQL table?
 
 Using SQL INSERT command, such as:
 
@@ -940,6 +1001,16 @@ Using SQL INSERT command, such as:
 INSERT INTO car (model, year) VALUES ('Ford C-Max', 2009);
 INSERT INTO car (model, year) VALUES ('Peugeot 208', 2017);
 ```
+
+When does schema validation occurs?
+
+During such INSERT.
+
+Can we update valid table record to some invalid value, such as via:
+
+    UPDATE car set year = 'aaab' WHERE model = 'Ford C-Max': 
+
+No, validation also occurs during record update.
 
 #### Java programming language
 
@@ -987,17 +1058,26 @@ So, should this Car value creation pass compiler check?
 
 Yes, unfortunately.
 
-### Comparison
+### A map structure in data systems
 
-|      | map value | map key      | map key value    | schema           |
-|------|-----------|--------------|------------------|------------------|
-| JSON | json      | name         | value            |                  |
-| CSV  | csv row   | column       | row column value |                  |
-| XML  | xml       | element name | element value    | XML Schema       |
-| SQL  | table row | column       | row column value | table definition |
-| Java | object    | field        | field value      | class            |
+Here is table that presents **map** structure terminology for different data systems: 
+
+|      | map       | key          | value                 | schema             |
+|------|-----------|--------------|-----------------------|--------------------|
+| JSON | object    | name         | value                 |                    |
+| CSV  | row       | field        | field value           |                    |
+| XML  | xml       | element name | element value         | XML Schema (or DTD)|
+| SQL  | record    | column       | record column value   | table definition   |
+| Java | object    | field        | field value           | class              |
 
 ### Garbage
+
+| --type-- | name       | email             | type      | model         | year |
+|----------|------------|-------------------|-----------|---------------|------|
+| PERSON   | John Doe   | john@gmail.com    |           |               |      |
+| CAR      |            |                   | LIMOUSINE | Ford C-Max    | 2009 |
+| CAR      |            |                   | SUV       | Peugeot 3008  | 2012 |
+| PERSON   | Rick Tracy | rick@facebook.com |           |               |      |
 
 Taking again previous example in shorter form:
 
@@ -1032,5 +1112,3 @@ Now, let's get back to our complete person value:
 - address string into map
 ### map "types"
 ### Bytes as data type, binary vs textual representation
-
-## Type system Comparison table - xml, java, json, map, sql
