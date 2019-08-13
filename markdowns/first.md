@@ -912,15 +912,15 @@ Actually, XML Schema is quite rich technology, so it has such possibility:
 CSV format, although very old, is still quite popular data format. Here's an example: 
 
 ```
-#model;year
-Ford C-Max;2009
-Peugeot 3008;2012
-Peugeot 206;2001
+#model,year
+Ford C-Max,2009
+Peugeot 3008,2012
+Peugeot 206,2001
 ```
 
 What delimiter character is used for separating the values ?
 
-It's semicolon, though other characters can also be used, such as comma, or colon, or whatever.
+It's comma, though other characters can also be used, such as semicolon, or colon, or whatever.
 
 Does this reminds you of a map? Why?
 
@@ -928,14 +928,13 @@ Well yes, it's kinda map also. CSV fields (columns) are kind of map keys, and ro
 
 Is there any schema technology to prevent invalid values here, such as:
 ```
-#model;year
-Ford C-Max;2009
+# model,year
+Ford C-Max,2009
 2012
 Peugeot 206
 ```
 
 Unfortunately no.
-
 
 #### SQL
 
