@@ -571,7 +571,32 @@ That's actually often the case, so there is a saying something like:
     
 That's why we often re-shape same data to better suit some new context. For example, when we want to present the 
 address on some user interface, say web page, our programs will frequently format (convert) given address 
-as single line string, to be easier to read.  
+as single line string, to be easier to read.
+
+Again, let's take another example. 
+Say we have a "birthday" key, which naturally should have a date value, and we decide to represent it as a string, like:
+
+    "birthday": "05/06/1994"
+
+What is the month value in given date above? Is it 5 or 6?
+
+Well, it can be both, one cannot tell just looking at example.
+
+So what is the burden placed on the reader of this piece of data?
+
+The reader has to know somehow the format used to represent the date, and use it to parse the date value.
+
+If we decide to use richer data type, such as a map, how would you specify some date using it? What keys would it contain?
+
+Something like "year", "month", "day". Like: `{ "year": 1994, "month": 05, "day": 6 }`
+
+And again, what is the downside of using the map?
+
+Compared to string, it's not so compact anymore, and also it effects readability, especially if we can use some date string format 
+which is standardized, eg. `"1994-06-05" (year-month-day)`. And all mainstream languages have pretty good support for date & timestamp 
+parsing, so it's not such a big burden to parse it in the code usually.
+
+So as often is the case, programming is all about trade-offs, choose wisely :) 
 
 ### Entity types
 
