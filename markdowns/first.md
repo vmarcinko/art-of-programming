@@ -1176,7 +1176,7 @@ the data in some other formats to some output (disk, network...).
 But does a program have some data inside its memory also?
 
 Of course, programs constantly convert data to/from external places to its in-memory format so it could be operated on.
-For example, some Java program can receive car data from some network request being in XML format, reads it as **Car object** in its memory, 
+For example, some Java program can receive car data from some network request being in XML format, reads it into its memory in its special Java shape, 
 process it maybe, and convert it to CSV format and write it to local disk.   
 
 Take this Java piece of code: 
@@ -1186,7 +1186,7 @@ Take this Java piece of code:
 		car1.year = 2012;
 ```
 
-We create single "car" data here. How do we call such single peice of data in Java (or generally, in every OO language)?
+We create single "car" data here. How do we call such single piece of data in Java (or generally, in every OO language)?
 
 An **object**! So - object is actually a data value.
 
