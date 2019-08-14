@@ -835,16 +835,17 @@ This looks like good data description, usable by programmer who creates some dat
 
 Yes.
 
-But the data can get corrupted due to bug (or hacker attack), so reader program still has to take care to validate the values when it reads them from somewhere.
-And we have description of data structure (car map in this example) in Word document.
+But the data can get corrupted due to bug (or hacker attack), so reader program still has to take care to validate 
+the values when it reads them from somewhere. And we have description of data structure (car map in this example) 
+in Word document.
 
-Would it be nice if reader progam would somehow **automatically** use this Word document to extract valid car
+Would it be nice if reader progam would somehow **automatically** use this Microsoft Word document to extract valid car
 data structure from it (allowed attributes, their types, optionality) and use it to check data validity?
 
 Well, that would be **really hard**, practically impossible. Human eye/brain is good for understanding Word document content, but program don't know how 
 to extract useful information from it because it's just a text.  
     
-But we really want this **automatic data validation**, so, let's give up from Word documentation for a schema. 
+But we really want this **automatic data validation**, so, let's give up from using a Microsoft Word for schema description. 
 What about schema represented **as a data**, something like following for "car" and "person" data:
 
 ```json
@@ -864,13 +865,19 @@ What about schema represented **as a data**, something like following for "car" 
 Is this usable by reader program now?
 
 Yeeees, it's fairly easy to read such **schema represented as a map**, and extract required information, such as allowed keys, 
-their types etc... And we can use such schema to finally validate incoming car data. 
+their types etc... And we can use such schema to finally validate incoming car data **automatically**.
 
 Programs read data to to process it, to do something with it. Data validation is usually done immediately 
 **after** reading the data, **before** processing it. Why?
 
 To catch potential error in data as soon as possible, because the processing code can fail 
 later due to invalid data and sometimes it's not easy to spot the cause and is much more costly to fix.
+
+Schema seems like a good thing, but as everything, it has a trade-off. What would be downsides of it?
+
+It takes human effort to create a schema, and to keep it updated it whenever we decide to change a data structure 
+(eg. we decide to add new attribute to person data - "nicknames"). In small developer teams, the writer and reader program is 
+frequently developed by single developer, so less care is necessary to keep these parts in sync. 
 
 ## Data systems
 
@@ -1163,10 +1170,57 @@ No, validation also occurs during record update.
 
 #### Java programming language
 
-Java, as most of modern statically-typed languages, uses **classes** as a schema, as a type definition.
+Programs read data in various formats from some input (disk, network ...), and write 
+the data in some other formats to some output (disk, network...). 
 
-So, if we want to specify "schema" for a car, having 2 attributes: model (string) and a year (integer), we create a Car class such as this:
+But does a program have some data inside its memory also?
 
+Of course, programs constantly convert data to/from external places to its in-memory format so it could be operated on.
+For example, some Java program can receive car data from some network request being in XML format, reads it as **Car object** in its memory, 
+process it maybe, and convert it to CSV format and write it to local disk.   
+
+Take this Java piece of code: 
+```java
+		Car car1 = new Car();
+		car1.model = "Ford C-Max";
+		car1.year = 2012;
+```
+
+We create single "car" data here. How do we call such single peice of data in Java (or generally, in every OO language)?
+
+An **object**! So - object is actually a data value.
+
+How do we call car attributes here in Java ("model", "year")?
+
+**Fields**!
+
+Do you see some **key-value** structure here, something similar to map?
+
+Yes, object is like a map, and fields are like map keys! 
+  
+And this example:
+
+```java
+		Car car1 = new Car();
+		car1.model = "Ford C-Max";
+		car1.year = true;
+```  
+
+Does it look OK?
+
+No, a year should not be able to accept boolean value!
+
+```java
+		Car car1 = new Car();
+		car1.model = "Ford C-Max";
+		car1.hasWife = true;
+```  
+
+No, a car object definitely should not have "hasWife" field.
+
+In Java, where can I check what fields does a object allows, and what are their types?
+
+In a **class**! For "car" example above, it would be something like:
 ```java
 public class Car {
 	public String model;
@@ -1174,19 +1228,23 @@ public class Car {
 }
 ```
 
-You can see how we specified 2 attributes, and their types (string and integer).
+OK, so if a class is a thing that defines:
+- allowed object fields
+- field type
 
-And then try to create invalid car value out of it, such as this:
+How do we call such concept?
 
- ```java
+A **type definition**, or a **schema**, right! So, a class is a schema for created object.
+
+Again, let's look at this invalid code example:
+```java
 		Car car1 = new Car();
 		car1.model = "Ford C-Max";
 		car1.year = true;
-```
+```  
+When does validation of a car value written as above happens in Java language?
 
-Whn does validation of a car value written as above happens in Java language?
-
-During compilation! It would fail with some message as following:
+During compilation moment! It would fail with some message as following:
 
         incompatible types: boolean cannot be converted to int
 
