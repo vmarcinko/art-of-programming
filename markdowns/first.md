@@ -790,22 +790,89 @@ And is this valid year value?
 
 Well, year in general can be negative (B.C.), but let's say we don't want to allow that here.
 
+What would happen if somebody by mistake or by intention, entered model of a car than is 100000000 characters long name?
+
+It would crash our system due to too much memory/space needed.
+
+So what do we want to specify for "model" string value?
+
+Maximum length. 
+
 OK, so we can say that **definition of "CAR" type** is consists of following set of keys:
-- "model" - string, not optional
+- "model" - string, not optional, maximum 100 characters
 - "year" - integer, not optional, only positive number
 
 This kind of type definition is frequently called a **schema**.
 
-For a moment, don't think how would we define it, but such a type definition, or a schema as we call it, 
-what would it be good for? 
+When 2 systems exchange the data, data writer and data reader must know the structure of the data to be able to create their programs, 
+meaning, they have to know data **schema** as we call it now.
 
-To be used for validation of car values (represented as maps).
+This schema information, can it be exchanged orally? Like:
+    
+    Writer programmer: Hey dude, I'm sending you this "car" data, and it has "model" and "year" keys. Both are mandatory. Got it?
+    Reader programmer: OK, now I know what a car data looks like and will use that during the coding. Thanx! 
+
+Yes, it can.
+
+But what worries you with this kind of schema information exchange?
+
+Schema information would be better written somewhere properly.
+
+And if we pick to write this schema definition in mail, or Word document?
+
+Well, it's **much** better that way definitely.
+
+OK, say we have written this schema definition in a Word document, something like:
+
+    Our product "Bad Ass Car Exporter" exports "car" data. The structure of car data is as follows:
+    - it has 2 keys - "model" and "year"
+    - "model" is mandatory string and it can be up to 100 chars long
+    - "year" is mandatory integer, and it cannot be negative
+    
+    Here's the data example: { "model": "Ford C-Max", "year": 2009 }
+
+This looks like good data description, usable by programmer who creates some data reader program, right?
+
+Yes.
+
+But the data can get corrupted due to bug (or hacker attack), so reader program still has to take care to validate the values.
+Can the reader program somehow use this Word document to check incoming data validity?
+
+Well, that would be **really hard**, practically impossible. Human eye is good for reading Word documents, but program don't know how 
+to extract useful data from it.  
+    
+So, let's give up from Word documentation for a schema. 
+What about schema represented **as a data**, something like following for "car" and "person" data:
+
+```json
+{
+  "car":    {
+              "model":  { "type": "string",  "optional": false, "max-length": 100 },
+              "year":   { "type": "integer", "optional": false, "min-value": 0 }
+            },
+
+  "person": { 
+              "name":  { "type": "string",  "optional": false, "max-length": 150 }, 
+              "email": { "type": "string",  "optional": false, "max-length": 200 }, 
+            }
+}
+``` 
+
+Is this usable by reader program?
+
+Yes, it's fairly easy to read such **schema represented as a map**, and extract required information, such as allowed keys, 
+their types etc... And we can use such schema to finally validate incoming car data. 
 
 Programs read data to to process it, to do something with it. Data validation is usually done immediately 
 **after** reading the data, **before** processing it. Why?
 
 To catch potential error in data as soon as possible, because the processing code can fail 
 later due to invalid data and sometimes it's not easy to spot the cause and is much more costly to fix.
+
+## Data systems
+
+In a life of programmer, one constantly converts data from one data system to another.
+Let's take a look at some of most popular ones.
 
 #### JSON
 
@@ -842,6 +909,10 @@ And what is JSON equivalent for a set, such as:
     #{ "john", "bob", "andy" }
     
 There is no such data type in JSON, only array for collection, but it does not guarantee element uniqueness which set does.
+
+So, when one needs to convert a set of elements to JSON format, what will one choose?
+
+A **JSON array**, because it's the closest thing to what we need. 
 
 Is there some schema technology for JSON data, that would provide validation to data written in such format?
 
@@ -947,6 +1018,41 @@ Actually, XML Schema is quite rich technology, so it has such possibility:
       </xs:simpleType>
 </xs:element>
 ```
+
+In following example:
+```xml
+<car>
+    <model>Ford C-Max</model>
+    <year>2009</year>
+    <owners>
+        <owner>John Smith</owner>
+        <owner>Rick Vaughn</owner>
+    </owners>
+</car>
+```
+If we would convert to general format, what would `<owners>` XML element be converted to?
+  
+To a list of strings, where each string represents owner name. Something like:
+
+    "owners": [ "John Smith", "Rick Vaughn" ]
+
+Would a **set** instead of **list** be good also?
+
+Well, maybe... More description of "owners" attribute would be needed.
+If "owners" attribute represents:
+- sequence of owner names chronologically, meaning, log of ownerships over time, then the owner can be repeated, and a **list** is needed   
+- just a collection of different owners, regardless if someone had multiple ownerships, then a **set** is better   
+
+Tremendous problems in software exist due to insufficiently clear description of data. That's why **naming is so important**, 
+because it's primary way to explain something.
+
+How would you rename "owners" attribute to express that it's chronological sequence of owners?
+
+Something like - "ownership-history", or "owners-log", or something like that... 
+Words "history" and "log" imply that something is chronological.  
+
+    General rule of thumb is - use a set only if you're sure that order is not important, or uniqueness is not guaranteed, 
+    otherwise a list is better default
 
 #### CSV (Comma Separated Values)
 
@@ -1145,10 +1251,4 @@ Now, let's get back to our complete person value:
 
 ### Flattening nested map into tabular data (SQL?)
 ### CSV, Excel vs SQL?
-
-### Reshaping data for better usability
-- list into map as index
-- date string into map
-- address string into map
-### map "types"
 ### Bytes as data type, binary vs textual representation

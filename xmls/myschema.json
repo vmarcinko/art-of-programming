@@ -1,0 +1,8 @@
+{
+  "car": {
+    "model":  {"type": "string",  "optional": false, "max-length": 100},
+    "year":   {"type": "integer", "optional": false, "min-value": 0}
+  },
+
+  "person": {}
+}
