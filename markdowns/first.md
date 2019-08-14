@@ -835,13 +835,16 @@ This looks like good data description, usable by programmer who creates some dat
 
 Yes.
 
-But the data can get corrupted due to bug (or hacker attack), so reader program still has to take care to validate the values.
-Can the reader program somehow use this Word document to check incoming data validity?
+But the data can get corrupted due to bug (or hacker attack), so reader program still has to take care to validate the values when it reads them from somewhere.
+And we have description of data structure (car map in this example) in Word document.
 
-Well, that would be **really hard**, practically impossible. Human eye is good for reading Word documents, but program don't know how 
-to extract useful data from it.  
+Would it be nice if reader progam would somehow **automatically** use this Word document to extract valid car
+data structure from it (allowed attributes, their types, optionality) and use it to check data validity?
+
+Well, that would be **really hard**, practically impossible. Human eye/brain is good for understanding Word document content, but program don't know how 
+to extract useful information from it because it's just a text.  
     
-So, let's give up from Word documentation for a schema. 
+But we really want this **automatic data validation**, so, let's give up from Word documentation for a schema. 
 What about schema represented **as a data**, something like following for "car" and "person" data:
 
 ```json
@@ -858,9 +861,9 @@ What about schema represented **as a data**, something like following for "car" 
 }
 ``` 
 
-Is this usable by reader program?
+Is this usable by reader program now?
 
-Yes, it's fairly easy to read such **schema represented as a map**, and extract required information, such as allowed keys, 
+Yeeees, it's fairly easy to read such **schema represented as a map**, and extract required information, such as allowed keys, 
 their types etc... And we can use such schema to finally validate incoming car data. 
 
 Programs read data to to process it, to do something with it. Data validation is usually done immediately 
