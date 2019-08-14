@@ -1256,7 +1256,8 @@ Is there some definition here that would say it is mandatory (not optional)?
 
 No, currently Java cannot specify that directly. It just defines what type it is.
 
-So, should this Car value creation pass compiler check?
+Following code example creates a car object without "year" field set, although we need it to be mandatory. 
+So, will this code pass compiler check?
  
 ```java
 		Car carValue1 = new Car();
@@ -1264,6 +1265,14 @@ So, should this Car value creation pass compiler check?
 ```
 
 Yes, unfortunately.
+
+Also, what if we want that "year" field should not have negative integer value? Can we specify that 
+using field definition inside the class?
+
+Also no.
+
+We will see later how Java enables to implement such additional validation during object creation, so we can be sure no 
+Car object is created bypassing these constraints. 
 
 ### A map structure in data systems
 
