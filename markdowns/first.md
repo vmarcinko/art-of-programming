@@ -1079,11 +1079,130 @@ What delimiter character is used for separating the values ?
 
 It's comma, though other characters can also be used, such as semicolon, or colon, or whatever.
 
+Does this remind you of an Microsoft Excel file? Why?
+
+Well, both have tabular structure. Actually, MS Excel is frequently used for working with CSV files (.csv), not just Excel ones (.xlsx).
+
 Does this reminds you of a map? Why?
 
 Well yes, it's kinda map also. CSV fields (columns) are kind of map keys, and rows contain separated values of those keys.
+So, CSV record such as `Ford C-Max,2009` would be equivalent as this map:
 
-Is there any schema technology to prevent invalid values here, such as:
+    { "model": "Ford C-Max", "year": 2009 }
+
+But single CSV file can have many rows. And if we say that single CSV record (row) is like a map, what is whole file then?
+
+It's a collection of maps, like **list (or set) of maps**, something like:. 
+
+    [
+        { "model": "Ford C-Max",    "year": 2009 },
+        { "model": "Peugeot 3008",  "year": 2012 },
+        { "model": "Peugeot 206",   "year": 2001 }
+    ]
+
+
+
+What would be names of CSV fields (columns) is you try to convert following person map to CSV?
+
+```json
+{
+    "name":     "John Doe",
+    "age":      56
+}
+```
+
+It would be "name" and "age".
+
+And if you tried to convert this person to CSV? 
+
+```json
+{
+    "name":     "John Doe",
+    "age":      56,
+    "street":         "Elm Street",
+    "street number":  123,
+    "city":           "Cleveland",
+}
+```
+
+It would be "name", "age", "street", "street number" and "city".
+
+And this person?
+
+```json
+{
+    "name":     "John Doe",
+    "age":      56,
+    "address":  {
+                    "street":         "Elm Street",
+                    "street number":  123,
+                    "city":           "Cleveland"
+                 }
+}
+```
+
+Well, hmmm, it can be the same as previous one that didn't have nested (inner) "address" map, meaning, 
+CSV fields would be again "name", "age", "street", "street number" and "city".
+
+We said earlier that a CSV record (row) is similar to a map, due to its key-value structure. 
+But what kind of map - **flat** or **nested**? 
+
+Flat! 
+
+Actually, this is frequently called **flattening** - converting nested map to a flat one. 
+
+But, what if we have a person map with 2 nested "address" maps, such as following one:
+
+```json
+{
+    "name":               "John Doe",
+    "age":                56,
+    "primary-address":    {
+                            "street":         "Elm Street",
+                            "street number":  123,
+                            "city":           "Cleveland"
+                          },
+    "secondary-address":  {
+                            "street":         "First Ave",
+                            "street number":  5,
+                            "city":           "New York"
+                          }
+}
+```
+
+After we **flatten** it, and convert to CSV - what would be CSV column names now?
+
+Well, we could add prefixes, to differentiate address columns, such as 
+"primary-" and "secondary-" prefixes in this caser:
+```
+# name, age, primary-street, primary-street-number, primary-city, secondary-street, secondary-street-number, secondary-city
+John Doe, 56, Elm Street, 123, Cleveland, First Ave, 5, New York
+```
+
+But what about a person that has list of addresses (undefined number of them), such as:
+```json
+{
+    "name":       "John Doe",
+    "age":        56,
+    "addresses":  [
+                    {
+                      "street":         "Elm Street",
+                      "street number":  123,
+                      "city":           "Cleveland"
+                    },
+                    {
+                      "street":         "First Ave",
+                      "street number":  5,
+                      "city":           "New York"
+                    }
+                  ]  
+}
+```
+
+Hmm, there is no proper way to convert it to CSV, or more precisely, to flatten it because CSV file must have predefined number of fields (columns) and here we don't know how many addresses can be present.
+
+Now, let's go to question to invalid values. Is there any schema technology for CSV file to prevent 
+invalid values here, such as:
 ```
 # model,year
 Ford C-Max,2009
@@ -1091,7 +1210,7 @@ Ford C-Max,2009
 Peugeot 206
 ```
 
-Unfortunately no.
+No.
 
 #### SQL
 
@@ -1109,15 +1228,9 @@ Well, **table column** is similar to **map key**, and **record (row) value** is 
 
     { "model": "Ford C-Max", "year": 2009 }
 
-But table can have many rows. And if we say that single table record is like a map, what is whole table then?
+Do you see some similarities with CSV? Why?
 
-It's a collection of maps, like **list (or set) of maps**, something like:. 
-
-    [
-        { "model": "Ford C-Max",    "year": 2009 },
-        { "model": "Peugeot 3008",  "year": 2012 },
-        { "model": "Peugeot 206",   "year": 2001 }
-    ]
+Yes, both store data in a table.
 
 And in SQL table, is it possible to have some invalid value, such as invalid "year" value within our "car" table:
 
@@ -1130,6 +1243,10 @@ And in SQL table, is it possible to have some invalid value, such as invalid "ye
 ?
 
 No, it's not possible, because definition of SQL table prevents such records.
+
+CSV is also tabular format - does it have such possibility to prevent invalid values?
+
+No. Only SQL has it, CSV does not. 
 
 OK, so let's say that "car" table given above is created with following statement:
 
@@ -1286,39 +1403,5 @@ Here is table that presents **map** structure terminology for different data sys
 | SQL  | record    | column       | record column value   | table definition   |
 | Java | object    | field        | field value           | class              |
 
-### Garbage
-
-| --type-- | name       | email             | type      | model         | year |
-|----------|------------|-------------------|-----------|---------------|------|
-| PERSON   | John Doe   | john@gmail.com    |           |               |      |
-| CAR      |            |                   | LIMOUSINE | Ford C-Max    | 2009 |
-| CAR      |            |                   | SUV       | Peugeot 3008  | 2012 |
-| PERSON   | Rick Tracy | rick@facebook.com |           |               |      |
-
-Taking again previous example in shorter form:
-
-    [ 
-        { "--type--": "PERSON", "name": "John Doe", "email": "john@gmail.com" }, 
-        { "--type--": "CAR", "model": "Ford C-Max", "year": 2009 }
-    ]
----
-
-Now, let's get back to our complete person value:
-
-    {
-        "id":             4413
-        "name":           "John Doe"
-        "address":        {
-                            "Street":         "Elm Street"
-                            "Street number":  123
-                            "City":           "Cleveland"
-                            "State":          "Ohio"
-                            "Country":        "USA"
-                        }
-        "age":            56
-        "employed":       true
-    }
-
-### Flattening nested map into tabular data (SQL?)
 ### CSV, Excel vs SQL?
 ### Bytes as data type, binary vs textual representation
