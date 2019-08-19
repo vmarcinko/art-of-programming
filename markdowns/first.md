@@ -1069,10 +1069,10 @@ Words "history" and "log" imply that something is chronological.
 CSV format, although very old, is still quite popular data format. Here's an example: 
 
 ```
-#model,year
-Ford C-Max,2009
-Peugeot 3008,2012
-Peugeot 206,2001
+# model, year
+Ford C-Max, 2009
+Peugeot 3008, 2012
+Peugeot 206, 2001
 ```
 
 What delimiter character is used for separating the values ?
@@ -1094,15 +1094,15 @@ But single CSV file can have many rows. And if we say that single CSV record (ro
 
 It's a collection of maps, like **list (or set) of maps**, something like:. 
 
-    [
-        { "model": "Ford C-Max",    "year": 2009 },
-        { "model": "Peugeot 3008",  "year": 2012 },
-        { "model": "Peugeot 206",   "year": 2001 }
-    ]
+```json
+[
+    { "model": "Ford C-Max",    "year": 2009 },
+    { "model": "Peugeot 3008",  "year": 2012 },
+    { "model": "Peugeot 206",   "year": 2001 }
+]
+```
 
-
-
-What would be names of CSV fields (columns) is you try to convert following person map to CSV?
+What would be names of CSV fields (columns) if you try to convert following person map to CSV?
 
 ```json
 {
@@ -1117,8 +1117,8 @@ And if you tried to convert this person to CSV?
 
 ```json
 {
-    "name":     "John Doe",
-    "age":      56,
+    "name":           "John Doe",
+    "age":            56,
     "street":         "Elm Street",
     "street number":  123,
     "city":           "Cleveland",
@@ -1170,13 +1170,45 @@ But, what if we have a person map with 2 nested "address" maps, such as followin
 }
 ```
 
-After we **flatten** it, and convert to CSV - what would be CSV column names now?
+After we **flatten** it, what would be total number of **address** CSV fields?
 
-Well, we could add prefixes, to differentiate address columns, such as 
-"primary-" and "secondary-" prefixes in this caser:
+It would be 6. 
+ 
+Would their names clash?
+
+Well yeah, if we don't rename them. But we should rename them, like, we could add prefixes, to differentiate between 2 nested address maps, 
+such as "primary-" and "secondary-" prefixes in this case:
 ```
 # name, age, primary-street, primary-street-number, primary-city, secondary-street, secondary-street-number, secondary-city
 John Doe, 56, Elm Street, 123, Cleveland, First Ave, 5, New York
+```
+
+If we had such CSV file with 2 person records, such as following:
+```
+# name, age, primary-street, primary-street-number, primary-city, secondary-street, secondary-street-number, secondary-city
+John Doe, 56, Elm Street, 123, Cleveland, First Ave, 5, New York
+Rick Smith, 44, Oak Street, 222, San Francisco,,,
+```
+
+What is the difference of second person (Rick Smith) to first one (John Doe)?
+
+Well, the second one doesn't have secondary address as first one. We can see that by empty row values for secondary address.
+
+If we would present this second person as a map, what value would it have under "secondary-address" key?
+
+It would be null. The person map would look like:
+
+```json
+{
+    "name":               "Rick Smith",
+    "age":                44,
+    "primary-address":    {
+                            "street":         "Oak Street",
+                            "street number":  222,
+                            "city":           "San Francisco"
+                          },
+    "secondary-address":  null
+}
 ```
 
 But what about a person that has list of addresses (undefined number of them), such as:
@@ -1230,7 +1262,7 @@ Well, **table column** is similar to **map key**, and **record (row) value** is 
 
 Do you see some similarities with CSV? Why?
 
-Yes, both store data in a table.
+Yes, both store data in a tabular format.
 
 And in SQL table, is it possible to have some invalid value, such as invalid "year" value within our "car" table:
 
@@ -1262,7 +1294,7 @@ we can see that SQL table definition consists of:
  - column data type
  - column optionality (null or not null)
  
-Does this reminds you of something?
+Does this reminds you of something? How do we call such a concept?
 
 Yes, a **schema**! SQL table is basically a schema that prevents invalid map data (table record) to be present in it.
 
@@ -1303,11 +1335,12 @@ Take this Java piece of code:
 		car1.year = 2012;
 ```
 
-We create single "car" data here. How do we call such single piece of data in Java (or generally, in every OO language)?
+We create single "car" data here, called "car1". How do we call such single piece of data in Java 
+(or generally, in every OO language)?
 
 An **object**! So - object is actually a data value.
 
-How do we call car attributes here in Java ("model", "year")?
+How do we call car attributes in Java ("model", "year")?
 
 **Fields**!
 
@@ -1351,7 +1384,8 @@ OK, so if a class is a thing that defines:
 
 How do we call such concept?
 
-A **type definition**, or a **schema**, right! So, a class is a schema for created object.
+A **type definition**, or a **schema**, right! So, a class is a schema for created object - it restricts what 
+kind of values an object can contain.
 
 Again, let's look at this invalid code example:
 ```java
@@ -1377,8 +1411,8 @@ Following code example creates a car object without "year" field set, although w
 So, will this code pass compiler check?
  
 ```java
-		Car carValue1 = new Car();
-		carValue1.model = "Ford C-Max";
+		Car car1 = new Car();
+		car1.model = "Ford C-Max";
 ```
 
 Yes, unfortunately.
