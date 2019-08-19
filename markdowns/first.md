@@ -1172,7 +1172,7 @@ But, what if we have a person map with 2 nested "address" maps, such as followin
 
 After we **flatten** it, what would be total number of **address** CSV fields?
 
-It would be 6. 
+It would be 6 - we have 2 nested address maps, and each has 3 fields. 
  
 Would their names clash?
 
@@ -1263,6 +1263,77 @@ Well, **table column** is similar to **map key**, and **record (row) value** is 
 Do you see some similarities with CSV? Why?
 
 Yes, both store data in a tabular format.
+
+If we take previously mentioned person map, such as this one:
+```json
+{
+    "name":       "John Doe",
+    "age":        56,
+    "addresses":  [
+                    {
+                      "street":         "Elm Street",
+                      "street number":  123,
+                      "city":           "Cleveland"
+                    },
+                    {
+                      "street":         "First Ave",
+                      "street number":  5,
+                      "city":           "New York"
+                    }
+                  ]  
+}
+```
+
+And we want to store such a map data into SQL table, how many columns would such a table have?
+
+It would have 8 - name, age, primary-street, primary-street-number, primary-city, secondary-street, secondary-street-number, secondary-city.  
+
+So we have map flattening again, same as with CSV.
+
+And what about list of addresses, such as:
+
+```json
+{
+    "name":       "John Doe",
+    "age":        56,
+    "addresses":  [
+                    {
+                      "street":         "Elm Street",
+                      "street number":  123,
+                      "city":           "Cleveland"
+                    },
+                    {
+                      "street":         "First Ave",
+                      "street number":  5,
+                      "city":           "New York"
+                    }
+                  ]  
+}
+```
+
+We couldn't convert this to CSV, what about SQL - is it possible somehow?
+
+Well yes! We could use 2 tables - one called **"person"** and the other one **"person_address"**.
+
+"person" would be something like:
+
+| id | name       | age |
+|----|------------|-----|
+| 22 | John Doe   | 56  |
+| 23 | Rick Smith | 44  |
+|    |            |     |
+|    |            |     |
+|    |            |     |
+
+and "person_address" like:
+
+| person_id | street     | street_number | city          |
+|-----------|------------|---------------|---------------|
+| 22        | Elm Street | 123           | Cleveland     |
+| 22        | First Ave  | 5             | New York      |
+| 23        | Oak Street | 222           | San Francisco |
+|           |            |               |               |
+|           |            |               |               |
 
 And in SQL table, is it possible to have some invalid value, such as invalid "year" value within our "car" table:
 
