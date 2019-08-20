@@ -1313,17 +1313,57 @@ And what about list of addresses, such as:
 
 We couldn't convert this to CSV, what about SQL - is it possible somehow?
 
-Well yes! We could use 2 tables - one called **"person"** and the other one **"person_address"**.
+Well yes! Beside **"person"** table, we could use additional table for person address, say **"person_address"**, 
+that would have a **reference** to its person.
 
 "person" would be something like:
+
+| name       | age |
+|------------|-----|
+| John Doe   | 56  |
+| Rick Smith | 44  |
+
+and "person_address" table like:
+
+| street     | street_number | city          |
+|------------|---------------|---------------|
+| Elm Street | 123           | Cleveland     |
+| First Ave  | 5             | New York      |
+| Oak Street | 222           | San Francisco |
+
+BUT.... Looking at this "person_address" table, how do we know a person that specific address belongs to?
+
+We don't! We need a way somehow **to reference** a "person" record from "person_address" record.  
+
+So, let's add new "person_name" column to "person_address" table to act as **reference**:
+
+| person_name | street     | street_number | city          |
+|-------------|------------|---------------|---------------|
+| John Doe    | Elm Street | 123           | Cleveland     |
+| John Doe    | First Ave  | 5             | New York      |
+| Rick Smith  | Oak Street | 222           | San Francisco |
+
+How do we call such **reference** in SQL world?
+
+A **foreign key**, right!
+
+The reference should be some column of target table that is **unique identifier**, because we want to be sure we referenced 
+the desired record correctly. We used "name" column in "person" table as this unique identifier. 
+
+Is a person's name generally considered unique value?
+
+Of course not, there can be many people with same name and last name (like "John Doe" here). 
+So "name" column is **very bad** as person **identifier**.
+
+So if we naturally don't have a unique identifier, we have to generate some artificial one, 
+such as auto-incrementing integer, and we will call this column "id",
+  
+Now, the "person" table would look something like:
 
 | id | name       | age |
 |----|------------|-----|
 | 22 | John Doe   | 56  |
 | 23 | Rick Smith | 44  |
-|    |            |     |
-|    |            |     |
-|    |            |     |
 
 and "person_address" like:
 
@@ -1332,10 +1372,8 @@ and "person_address" like:
 | 22        | Elm Street | 123           | Cleveland     |
 | 22        | First Ave  | 5             | New York      |
 | 23        | Oak Street | 222           | San Francisco |
-|           |            |               |               |
-|           |            |               |               |
 
-And in SQL table, is it possible to have some invalid value, such as invalid "year" value within our "car" table:
+In SQL table, is it possible to have some invalid value, such as invalid "year" value within our "car" table:
 
 | model         | year |
 |---------------|------|
