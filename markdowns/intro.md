@@ -48,4 +48,28 @@ Well, pushing this circle data to graphics card output.
 
 ---
 
- 
+Now, let's imagine a program, that
+- reads a number from HTTP request
+- creates record in SQL table about number received
+- calculates result by incrementing a number by 1 if it is weekend, or increment by 2 if it's working day
+- writes HTTP response with result number 
+
+What read operations we have hear?
+
+These are:
+- reading data that represents HTTP request
+- reading current time from hardware clock!
+
+What processing phase operations we have hear?
+
+Well, these are:
+- extracting number from HTTP request data
+- extracting data from time data that represents whether it is weekend or not  
+- creating SQL command from received number to create a record in a SQL table
+- calculating result by incrementing received number by desired increment
+- creating HTTP response data that from calculated result number
+
+And finally, what are output operations
+- sending SQL command to SQL database
+- writing HTTP response data to network
+
