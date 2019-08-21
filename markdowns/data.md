@@ -1170,11 +1170,11 @@ But, what if we have a person map with 2 nested "address" maps, such as followin
 }
 ```
 
-After we **flatten** it, what would be total number of **address** CSV fields?
+After we **flatten** it, what would be total number of CSV fields?
 
-It would be 6 - we have 2 nested address maps, and each has 3 fields. 
+It would be 8 - "name", "age", and 6 address fields, 3 in each address. 
  
-Would their names clash?
+Those 6 address fields -  would their names clash?
 
 Well yeah, if we don't rename them. But we should rename them, like, we could add prefixes, to differentiate between 2 nested address maps, 
 such as "primary-" and "secondary-" prefixes in this case:
