@@ -59,10 +59,10 @@ f(a, b) = a + b * 2;
 Can you give some examples where these 2 input argument can come from?
 
 Well, from any kind of input. For example:
-- from HTTP request (network)
-- from some file
-- from web form
-- from command line arguments when program was executed from terminal (eg. DOS prompt, Unix shell...)
+- HTTP request (network)
+- some file
+- web form
+- command line arguments when program was executed from terminal (eg. DOS prompt, Unix shell...)
 
 Let's present this input reading function in some code such as:
 
@@ -86,7 +86,7 @@ But we need somehow to push result number to some output. What kind of output ex
 - HTTP response (network)
 - some file
 - some web page
-- console if the program was executed from terminal)
+- console when the program was executed from terminal
 
 So now our program would look like:
 ```
@@ -136,6 +136,37 @@ Which typo of functions is not found in math?
 
 Those time-dependent functions - push or pull functions.
 
-We call such time-dependent functions **side-effects**, or **actions**. Those math-like functions, **calculations**, are also frequently called **pure functions**, 
-because their result depends solely on argument values - if the arguments are same, the result will always be the same.
+We call such time-dependent functions **side-effects**, or **actions**. Those math-like functions, **calculations** as we called them, 
+are also frequently called **pure functions**, because their result depends solely on argument values - if the arguments are same, 
+the result will always be the same.
+
+When any program is started, it is basically a call to a single function, so let's wrap our previous code in a single **main** function:
+
+```
+    main () = {
+        input-args-map = read-from-some-input();
+        result = f(input-args-map.a, input-args-map.b);
+        write-to-some-output(result);
+    }
+```
+
+How many arguments has this **main** function?
+
+None.
+
+How many **dependency** function it has?
+
+It has 3.
+
+Does it contain **side-effects** ?
+
+Of course, those pull and push functions are side-effects.
+
+And, does it contain any **pure functions**?
+
+Yes, this function "f" which calculates the output result value, it is a pure function.
+
+OK, so function "main" contains side-effects **and** pure function. So overall looking, is "main" function a **pure** one?
+
+No, it is not pure. A function is pure when it doesn't have a single side-effect!
 
