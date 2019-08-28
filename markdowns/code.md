@@ -5,7 +5,7 @@ Let's take this math function:
 f(a, b) = a + b * 2; 
 ```
 
-What is the name of the function?
+What is the **name** of the function?
 
 It's called "f". 
 
@@ -13,13 +13,15 @@ How many **input** arguments it has?
 
 It has 2 - "a" and "b".
 
-What are their data type?
+What are their **data type**?
 
-Well, these are numbers of course. Math is dealing with only such type of data.
+Well, these are **numbers** of course. Math is dealing with only such type of data.
 
 And what is return data type?
 
 Also a number.
+
+### Dependencies
 
 This function "f" - what other functions it depends on?
 Maybe it would look more obvious if we used other syntax for this function, such as:
@@ -30,18 +32,17 @@ f(a, b) = +(a, *(b, 2));
 It depends on 2 functions - adding (+) and multiplication (*). 
 We call such functions - **dependencies** of function f.
 
-Where are these function + and * defined?
+Where did we define these functions + and * ?
 
-Nowhere, these are "primitive" functions.
+Well, these are "primitive" functions, we don't define them. Programming languages provide them "out of the box". 
 
-Do these + and * functions care if/where they are used? Or in other words, are they somehow made only 
-for usage in function "f" which depends on them currently?
+Do these + and * functions know where they will be used ?
 
 Of course not, any other function can use + and * functions!   
 
 If we define another function:
 ```
-hoho(x) = f(x, 11); 
+hoho(x) = f(x, 11) + 1; 
 ```
 
 How many dependency functions this "hoho" function has?
@@ -65,11 +66,11 @@ And does any function knows what it depends on ?
 Of course, function body is implemented using dependency functions. 
 So if we present it with a graph, we can say that:
 
-    (hoho) --- needs --> (f) --- needs --> (+) and (*) 
+    (hoho) --- depends on --> (f) --- depends on --> (+) and (*) 
 
-Function "hoho" is **user (or client)** of fucntion "f", and function "f" is **user of functions "+" and "***".
-Functions "+" and "***" are dependencies of function "f" ,and function "f" is dependency of function "hoho".
-And function "hoho" is not dependency of anyone currently because there is no **user** of function "hoho". 
+Function "hoho" is **user (or client)** of function "f", and function "f" is **user** of functions "+" and "*" .
+Functions "+" and "***" are **dependencies** of function "f" ,and function "f" is **dependency** of function "hoho".
+And function "hoho" is no ones **dependency** because there is no **user** of function "hoho". 
 
 Let's repeat the definition of the function "f":
 ```
@@ -89,18 +90,52 @@ What functions it depends right now?
 
 It depends only on function "+" now.
 
-Ok, 
+Ok, so "dependency graph" now looks like this:
+
+    (hoho) --- depends on --> (f) --- depends on --> (+) 
 
 Function "hoho" we defined previously as this:
 ```
-hoho(x) = f(x, 11); 
+hoho(x) = f(x, 11) + 1; 
 ```
-
 Does it care how function "f" is implemented now in different way? Meaning, does it care if function "f" uses implementation with "+" and "*" or just "+" to calculate its result?
 
-No, it doesn't care. It just cares that for some input arguments it produces correct result, not how it is implemented.
+No, it doesn't care. It just cares that it calculates the correct result, not how it is implemented. 
 
-OK, so we can say that **user** functions don't care how their dependencies are implemented as long as they produce correct result.
+We gonna change our function "f" to return a **string** instead of **number**, something like:
+
+```
+f(a, b) = concat("Result is ", a + b * 2); 
+```
+
+BTW, "concat" function ties all of its arguments into single string, like `concat("Hello", "World", 33)` would produce "HelloWorld33" string.
+
+Does our function "hoho" now cares about this change? Will it get broken because of it?
+
+Yes it will cause a bug since the string is returned now, and it cannot increment it by 1, it needs a number returned.
+
+OK, but if we decide to change the original function "f" to require new third argument, such as:
+```
+f(a, b, c) = a + b * 2 + c; 
+```
+
+Will this cause a bug with function "hoho" that uses this function "f"?
+
+Yes, because function "hoho" calls "f" with only 2 arguments.
+
+OK, so tell me what of following statements is true.
+```
+User function that calls some dependency function cares about its:
+a) number of input arguments
+b) type of input arguments
+c) how the function is implemented (function body)
+d) type of result value
+```
+
+Well, a), b) and d) are true. These parts are called function **contract**. 
+
+A **contract** is the thing that is of interest to a user of a function, and **implementation** (function body) 
+can be freely changed as long the contract is stable.
 
 ### Pure functions and side-effects
 
@@ -228,5 +263,40 @@ OK, so function "main" contains side-effects **and** pure function. So overall l
 
 No, it is not pure. A function is pure when it doesn't have a single side-effect!
 
----
+### Message-based functions
+
+Let's get back to our function "f":
+```
+f(a, b) = a + b * 2; 
+```
+
+What would be values of arguments **a** and **b** in following example of a function "f" call:
+
+    f(3, 2)
+    
+Argument "a" would be 3, and argument "b" would be 2.
+
+OK, so this list of arguments is kinda bundle of **name-value** or **key-value** pairs:
+- a = 3
+- b = 2 
+
+What does it remind you of?
+
+Yes, a **map**! Such as: `{"a": 3, "b": 2}`
+
+So, let's compare create function "f" with new function "f2" that takes **single map argument**:
+
+```
+f (a, b) = a + b * 2;
+f2 (argmap) = argmap.a + argmap.b * 2;
+
+Call examples:
+f (3, 2)
+f2 ({"a": 3, "b": 2}) 
+```
+BTW, syntax `somemap.somekey` means "take a value under key 'somekey' in map 'somemap'".
+
+Would these 2 functions give same result for given call examples ?
+
+Yes, they would!
 
